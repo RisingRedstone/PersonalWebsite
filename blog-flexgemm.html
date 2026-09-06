@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlexGEMM — Blog | Pratham Gohil</title>
+    <meta name="description" content="Extending a Triton-powered GEMM backend for 3D sparse convolutions with CPU fallback support for hardware with limited GPU memory.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <article class="blog-post">
+        <div class="container">
+            <div class="blog-post-content">
+                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                
+                <header class="post-header">
+                    <span class="post-icon">&#x1F527;</span>
+                    <h1>FlexGEMM — CPU Fallback</h1>
+                    <p class="post-subtitle">Cross-Platform Backend for High-Performance Sparse 3D Convolutions</p>
+                    <div class="post-meta">
+                        <span class="reading-time">&#x1F552; 8 min read</span>
+                        <a href="https://github.com/RisingRedstone/FlexGEMM" target="_blank" rel="noopener" class="github-link">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                            View on GitHub (Fork)
+                        </a>
+                    </div>
+                    <div class="tech-tags">
+                        <span>Python</span>
+                        <span>Triton</span>
+                        <span>Sparse Convolutions</span>
+                        <span>PyTorch</span>
+                        <span>CPU Kernels</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <section id="overview">
+                        <h2>Overview</h2>
+                        <p>FlexGEMM is a Triton-powered GEMM backend specifically designed for 3D sparse convolutions used in voxel-based neural networks. The original project (by JeffreyXiang) achieves ~2x speedup over existing solutions like <code>spconv</code> and <code>torchsparse</code> on FP16 and TF32 precision, tested on NVIDIA A100 80GB PCIe.</p>
+                        <p>My contribution focuses on extending coverage to CPU hardware — specifically writing CPU fallback implementations for the core coordinate-building CUDA kernels so FlexGEMM can operate on hardware with limited or no GPU memory. This work was motivated by hitting VRAM bottlenecks while running TRELLIS 2 (a 3D generation model that depends on sparse convolutions).</p>
+                    </section>
+
+                    <section id="problem">
+                        <h2>The Problem</h2>
+                        <p>3D sparse convolutions operate on voxel grids where most cells are empty. The key computational challenge isn't the convolution itself — it's building the coordinate maps that tell the kernel which input voxels map to which output voxels. The original FlexGEMM implements these as CUDA kernels:</p>
+                        <ul>
+                            <li><code>hashmap_build_sparse_conv_out_coords</code> — Builds output coordinate arrays for regular sparse convolutions using hash maps</li>
+                            <li><code>expand_unique_build_sparse_conv_out_coords</code> — Expands and deduplicates output coordinates</li>
+                            <li><code>hashmap_build_submanifold_conv_neighbour_map</code> — Builds neighbour maps for submanifold convolutions (where input and output coordinates are identical)</li>
+                        </ul>
+                        <p>When GPU VRAM is exhausted (common with large 3D models on consumer hardware), there's no fallback — the entire pipeline fails. My work provides CPU-native implementations so these operations can complete, albeit at reduced speed.</p>
+                    </section>
+
+                    <section id="implementation">
+                        <h2>Implementation</h2>
+                        
+                        <h3 id="completed-kernels">Completed Kernels</h3>
+                        <p><strong><code>hashmap_build_sparse_conv_out_coords</code></strong> — CPU-native implementation tested and verified for correctness. Translates the CUDA hash-map-based coordinate building to CPU using Python dictionaries and NumPy operations. The key challenge was maintaining the same hash-collision handling semantics as the GPU version.</p>
+                        <p><strong><code>expand_unique_build_sparse_conv_out_coords</code></strong> — CPU-native implementation tested and verified for correctness. Handles the expansion of coordinate sets with deduplication, critical for ensuring output coordinates are unique before convolution.</p>
+
+                        <h3 id="in-progress">In Progress</h3>
+                        <p><strong><code>hashmap_build_submanifold_conv_neighbour_map</code></strong> — Currently functional but requires optimization. The CPU path is ~10x slower than the GPU path; the initial implementation prioritized correctness over performance. The bottleneck is poor performance of PyTorch CPU ops like <code>masked_select</code> when operating on large sparse tensors.</p>
+                    </section>
+
+                    <section id="technologies">
+                        <h2>Key Technologies</h2>
+                        <ul>
+                            <li><strong>Triton kernel language</strong> — The GPU kernels are written in Triton, a Python-like DSL for GPU programming. Understanding Triton was essential for writing correct CPU equivalents.</li>
+                            <li><strong>PyTorch sparse tensor operations</strong> — COO/CSC sparse formats for representing voxel coordinates and neighbour relationships.</li>
+                            <li><strong>Split-K parallelism</strong> — Used in the GPU path for large convolutions; the CPU path uses different parallelization strategies.</li>
+                            <li><strong>Map/coordinate building</strong> — The fundamental operation: given input coordinates and a kernel size, determine which output coordinates exist and how they map.</li>
+                        </ul>
+                    </section>
+
+                    <section id="challenges">
+                        <h2>Challenges & Trade-offs</h2>
+                        <p>The fundamental tension in CPU fallback design is <strong>correctness vs. performance</strong>. The GPU kernels are highly optimized for parallel execution — hash maps with atomic operations, warp-level primitives, and memory coalescing. Translating these to CPU requires different algorithms entirely:</p>
+                        <ul>
+                            <li>GPU hash maps → Python dictionaries (correct but slow)</li>
+                            <li>Warp-level atomics → Sequential operations with locks</li>
+                            <li>Memory-coalesced access → Cache-friendly but different access patterns</li>
+                        </ul>
+                        <p>The <code>masked_select</code> bottleneck on the CPU path is a known PyTorch limitation. I've raised this with the FlexGEMM maintainers to discuss architectural integration approaches for a maintained CPU execution path. Potential solutions include replacing <code>masked_select</code> with boolean indexing or implementing custom C++ extensions.</p>
+                    </section>
+
+                    <section id="status">
+                        <h2>Status & Next Steps</h2>
+                        <p>Two of three kernels are complete and verified. The submanifold convolution neighbour map is functional but needs optimization. The long-term goal is to integrate the CPU path into FlexGEMM's main codebase as a first-class fallback, enabling 3D sparse convolution models to run on CPU-only hardware (laptops, edge devices, cloud instances without GPUs).</p>
+                        <p>This work directly enables running models like TRELLIS 2 on consumer hardware where VRAM is the limiting factor, democratizing access to 3D generation research.</p>
+                    </section>
+
+                    <section class="related-projects">
+                        <h2>Related Projects</h2>
+                        <div class="related-grid">
+                            <a href="blog-threadweaver.html" class="related-card">
+                                <span>&#x26A1;</span>
+                                <div>
+                                    <strong>Threadweaver Core</strong>
+                                    <p>HPC concurrency primitives</p>
+                                </div>
+                            </a>
+                            <a href="blog-recursivemas.html" class="related-card">
+                                <span>&#x1F916;</span>
+                                <div>
+                                    <strong>Recursive-MAS MiniCPM</strong>
+                                    <p>Edge-optimized transformer</p>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="post-toc">
+                <h4 class="toc-title">On this page</h4>
+                <ul class="toc-list">
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#problem">The Problem</a></li>
+                    <li>
+                        <a href="#implementation">Implementation</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#completed-kernels">Completed Kernels</a></li>
+                            <li class="toc-h3"><a href="#in-progress">In Progress</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#technologies">Key Technologies</a></li>
+                    <li><a href="#challenges">Challenges & Trade-offs</a></li>
+                    <li><a href="#status">Status & Next Steps</a></li>
+                </ul>
+            </aside>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('readingProgress').style.width = scrolled + '%';
+        });
+
+        const tocLinks = document.querySelectorAll('.toc-list a');
+        const sections = document.querySelectorAll('.post-content section[id], .post-content h3[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) current = section.getAttribute('id');
+            });
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

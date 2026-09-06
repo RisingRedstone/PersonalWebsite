@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive-MAS MiniCPM — Blog | Pratham Gohil</title>
+    <meta name="description" content="Edge-optimized recursive-thinking multi-agent system. Currently in active development.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#now">Now</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <article class="blog-post">
+        <div class="container">
+            <div class="blog-post-content">
+                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                
+                <header class="post-header">
+                    <span class="post-icon">&#x1F916;</span>
+                    <h1>Recursive-MAS MiniCPM</h1>
+                    <p class="post-subtitle">Edge-Optimized Recursive Thinking with Mixed Attention Architecture</p>
+                    <div class="post-meta">
+                        <span class="locked-badge-large">&#x1F512; Locked — Active Development</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span>PyTorch</span>
+                        <span>Transformers</span>
+                        <span>Grouped Query Attention</span>
+                        <span>Rotary Embeddings</span>
+                        <span>Linear Attention</span>
+                        <span>DCT Compression</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <p>This project implements an edge-optimized recursive-thinking multi-agent system designed to reduce inference overhead while maintaining reasoning quality. The architecture uses a custom transformer with mixed linear and full attention patterns, Grouped Query Attention for memory efficiency, and experimental weight compression techniques.</p>
+                        <p><strong>Status:</strong> Currently in active development and testing. Full technical details, implementation specifics, and performance benchmarks will be published once the research is complete and validated.</p>
+                        <p><strong>High-level approach:</strong></p>
+                        <ul>
+                            <li>Custom transformer implementation (no external dependencies)</li>
+                            <li>Mixed attention pattern balancing efficiency and expressiveness</li>
+                            <li>Memory-optimized attention mechanisms for edge deployment</li>
+                            <li>Experimental frequency-domain weight compression</li>
+                        </ul>
+                        <p>For updates on this and other projects, check the <a href="index.html#now">Currently Working On</a> section on the main page.</p>
+                    </section>
+
+                    <section class="related-projects">
+                        <h2>Related Projects</h2>
+                        <div class="related-grid">
+                            <a href="blog-cleaning-robot.html" class="related-card">
+                                <span>&#x1F9F9;</span>
+                                <div>
+                                    <strong>Multi-Agent Cleaning Robot</strong>
+                                    <p>Multi-agent RL with PPO/MAPPO</p>
+                                </div>
+                            </a>
+                            <a href="blog-flexgemm.html" class="related-card">
+                                <span>&#x1F527;</span>
+                                <div>
+                                    <strong>FlexGEMM</strong>
+                                    <p>HPC for sparse convolutions</p>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threadweaver Core — Blog | Pratham Gohil</title>
+    <meta name="description" content="Building lock-free concurrency primitives achieving 1.25B ops/sec in C++23. Cache-line alignment, huge pages, and branchless programming.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Post -->
+    <article class="blog-post">
+        <div class="container">
+            <div class="blog-post-content">
+                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                
+                <header class="post-header">
+                    <span class="post-icon">&#x26A1;</span>
+                    <h1>Threadweaver Core</h1>
+                    <p class="post-subtitle">Ultra-Low Latency Concurrency Infrastructure in C++23</p>
+                    <div class="post-meta">
+                        <span class="reading-time">&#x1F552; 12 min read</span>
+                        <a href="https://github.com/RisingRedstone/Matching-Engine-Threadweaver" target="_blank" rel="noopener" class="github-link">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                            View on GitHub
+                        </a>
+                    </div>
+                    <div class="tech-tags">
+                        <span>C++23</span>
+                        <span>Lock-free</span>
+                        <span>Atomics</span>
+                        <span>Huge Pages</span>
+                        <span>Callgrind</span>
+                        <span>LTTng</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <section id="overview">
+                        <h2>Overview</h2>
+                        <p>Threadweaver Core is a from-scratch concurrency infrastructure library engineered for ultra-high-throughput, ultra-low-latency scenarios. The project explores the fundamental limits of inter-thread communication on modern hardware, achieving peak SCSP (Simple Cell-Simple Path) throughput of <strong>1.25 billion operations per second</strong> through careful hardware-aware design.</p>
+                        <p>The library provides a hierarchy of concurrency primitives — from simple single-producer/single-consumer ring buffers to scalable multi-producer cell-lockable designs — each optimized for specific contention patterns. The key insight driving the design is that <em>contention should be distributed across cells rather than bottlenecked at a single commit point</em>.</p>
+                    </section>
+
+                    <section id="architecture">
+                        <h2>Architecture</h2>
+                        
+                        <h3 id="ring-buffers">Ring Buffer Designs</h3>
+                        <p>The core data structure is a ring buffer, but not the textbook variety. Three distinct implementations target different contention profiles:</p>
+                        <ul>
+                            <li><strong>Simple Branchless Buffer</strong> — Uses inline x86 <code>cmov</code> instructions to replace conditional branches with conditional moves, eliminating branch misprediction penalties. Ideal for single-producer/single-consumer paths.</li>
+                            <li><strong>Three-Pointer Lock-Free MPSC</strong> — Separates <code>write_head</code> (CAS-wait claim), <code>commit_head</code> (prevents false sharing), and <code>read_head</code>. The separation ensures producers never contend with each other at the cache-line level.</li>
+                            <li><strong>Cell-Lockable Design</strong> — Distributes contention across individual cells using sub-byte atomicity via <code>lock bts</code>. Multiple concurrent writers can operate on different cells simultaneously, achieving 400M ops/sec in SCMP (Shared Memory Concurrent Path) mode.</li>
+                        </ul>
+
+                        <h3 id="memory-layout">Memory Layout</h3>
+                        <p>Every data structure is designed around cache-line awareness. The <code>CacheLineSlot&lt;D, Header&gt;</code> template guarantees exact 64-byte alignment via <code>static_assert</code>, ensuring no false sharing between adjacent slots. The <code>CacheLinePacked&lt;D, Header&gt;</code> union provides dual access — raw <code>uint64_t[]</code> for zero-copy serialization and structured <code>CacheLineSlot</code> for type-safe operation.</p>
+                        <p>For the cell-lockable variant, <code>CacheLineUint8LengthHeaderPacked&lt;D&gt;</code> packs both a lock bit and length into a single <code>uint8_t</code>, enabling sub-byte atomic operations via <code>lock bts</code> bit-manipulation.</p>
+                    </section>
+
+                    <section id="optimizations">
+                        <h2>Key Optimizations</h2>
+                        
+                        <h3 id="huge-pages">Huge Pages & TLB Elimination</h3>
+                        <p>Standard 4KB pages create TLB pressure at scale. By using 2MB Huge Pages via <code>mmap(MAP_SHARED | MAP_ANON | MAP_HUGE_2MB)</code>, we eliminate TLB misses entirely for buffers up to 512MB, enabling linear scaling where smaller pages would plateau.</p>
+
+                        <h3 id="zero-copy">Zero-Copy IPC</h3>
+                        <p>The custom ARC-based shared memory allocator enables zero-copy inter-process communication. Combined with POSIX <code>shm_open</code>/<code>shm_unlink</code> lifecycle management and <code>MREMAP_MAYMOVE</code> runtime resizing, data passes between processes without a single memcpy.</p>
+
+                        <details>
+                            <summary>Compile-Time Safety Contracts</summary>
+                            <p>C++20 concepts enforce safety contracts at compile time:</p>
+                            <ul>
+                                <li><code>PowerOfTwo&lt;N&gt;</code> — Enforces power-of-two capacity for bitwise modulo indexing</li>
+                                <li><code>LockableCell&lt;T&gt;</code> — Contract requiring <code>try_lock</code>/<code>unlock</code>/<code>clear_data</code>/<code>contains_data</code></li>
+                                <li><code>ReadLockableIndex&lt;Layout&gt;</code> / <code>WriteLockableIndex&lt;Layout&gt;</code> — Validates guard types at compile time</li>
+                                <li><code>LayoutVerification&lt;T&gt;</code> — Checks <code>MemLayout</code>/<code>data_type</code>/<code>index_type</code>/atomic heads/<code>operator[]</code></li>
+                            </ul>
+                        </details>
+
+                        <details>
+                            <summary>RAII Guard Hierarchy</summary>
+                            <p>A four-layer RAII guard system ensures locks are always released:</p>
+                            <ol>
+                                <li><code>SingleResourceLockGuard</code> — Stateless, single-resource lock</li>
+                                <li><code>InstSingleResourceLockGuard</code> — Instance-storing variant</li>
+                                <li><code>InstSingleResourceLockGuardWrapper</code> — Composable chaining</li>
+                                <li><code>TemplateLockedLockGuard</code> — Type-state locking: <code>T&lt;false&gt; → T&lt;true&gt;</code></li>
+                            </ol>
+                        </details>
+                    </section>
+
+                    <section id="performance">
+                        <h2>Performance Results</h2>
+                        <div class="benchmark-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Configuration</th>
+                                        <th>Throughput</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SCSP (core-pinned + cache-saturating)</td>
+                                        <td><strong>1.25B ops/sec</strong></td>
+                                        <td>Peak single-path throughput</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SCMP (cell-lockable, multi-writer)</td>
+                                        <td><strong>400M ops/sec</strong></td>
+                                        <td>Multiple concurrent writers</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Approach A vs B (callgrind)</td>
+                                        <td>0.28s vs 0.57s</td>
+                                        <td>Total execution time comparison</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>Profiling was done with <strong>callgrind</strong> (instruction counting per function/benchmark) and <strong>kcachegrind</strong> for flow graph visualization. Non-blocking execution tracing used <strong>LTTng-UST</strong> with <strong>URCU</strong> (Userspace RCU) for safe memory reclamation.</p>
+                    </section>
+
+                    <section id="lessons">
+                        <h2>Lessons Learned</h2>
+                        <ul>
+                            <li><strong>False sharing is the silent killer.</strong> Separating the commit_head from write_head in the MPSC design was the single biggest throughput improvement — a single cache-line bounce was costing 30% of peak performance.</li>
+                            <li><strong>Branchless isn't always faster.</strong> <code>cmov</code> wins when branches are unpredictable, but predictable branches with good branch prediction can outperform forced branchless code. Profile, don't guess.</li>
+                            <li><strong>Huge pages matter more than you think.</strong> The difference between 4KB and 2MB pages at 512MB buffer sizes isn't incremental — it's the difference between linear scaling and a hard plateau.</li>
+                            <li><strong>Compile-time contracts catch real bugs.</strong> The C++20 concept system caught three categories of layout mismatches during development that would have been subtle runtime corruption otherwise.</li>
+                            <li><strong>Cell-lockable scales better than 3-pointer.</strong> The commit_head bottleneck in the 3-pointer approach creates contention under heavy multi-producer load. Cell-lockable distributes locks across cells proportionally to buffer capacity, yielding 3× improvement at 8×8 threads.</li>
+                        </ul>
+                    </section>
+
+                    <section class="related-projects">
+                        <h2>Related Projects</h2>
+                        <div class="related-grid">
+                            <a href="blog-flexgemm.html" class="related-card">
+                                <span>&#x1F527;</span>
+                                <div>
+                                    <strong>FlexGEMM</strong>
+                                    <p>Sparse 3D convolutions — another HPC project</p>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Table of Contents -->
+            <aside class="post-toc">
+                <h4 class="toc-title">On this page</h4>
+                <ul class="toc-list">
+                    <li><a href="#overview">Overview</a></li>
+                    <li>
+                        <a href="#architecture">Architecture</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#ring-buffers">Ring Buffer Designs</a></li>
+                            <li class="toc-h3"><a href="#memory-layout">Memory Layout</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#optimizations">Key Optimizations</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#huge-pages">Huge Pages</a></li>
+                            <li class="toc-h3"><a href="#zero-copy">Zero-Copy IPC</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#performance">Performance Results</a></li>
+                    <li><a href="#lessons">Lessons Learned</a></li>
+                </ul>
+            </aside>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Reading progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('readingProgress').style.width = scrolled + '%';
+        });
+
+        // Active TOC highlighting
+        const tocLinks = document.querySelectorAll('.toc-list a');
+        const sections = document.querySelectorAll('.post-content section[id], .post-content h3[id]');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

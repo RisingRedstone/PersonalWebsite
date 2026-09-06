@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Pratham Gohil</title>
+    <meta name="description" content="Technical deep-dives into my major projects — from billion-ops-per-second concurrency primitives to multi-agent reinforcement learning.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <section class="blog-header">
+        <div class="container">
+            <p class="blog-header-label">Technical Writing</p>
+            <h1>Blog</h1>
+            <p>Deep-dives into architecture, implementation details, and lessons learned from my major projects. Each post covers the what, why, and how — with code-level specifics.</p>
+        </div>
+    </section>
+
+    <!-- Blog Grid -->
+    <section class="section">
+        <div class="container">
+            <div class="blog-grid">
+                <article class="blog-card">
+                    <div class="blog-card-top">
+                        <span class="blog-icon">&#x26A1;</span>
+                        <div class="blog-card-meta">
+                            <span class="blog-category">HPC / Systems</span>
+                            <span class="blog-read-time">12 min read</span>
+                        </div>
+                    </div>
+                    <h2><a href="blog-threadweaver.html">Threadweaver Core</a></h2>
+                    <p class="blog-subtitle">Ultra-Low Latency Concurrency Infrastructure</p>
+                    <p class="blog-excerpt">Building lock-free data structures that hit 1.25B ops/sec. Cache-line alignment, huge pages, atomic primitives, and the art of branchless programming in C++23.</p>
+                    <div class="blog-card-footer">
+                        <div class="tech-tags">
+                            <span>C++23</span>
+                            <span>Lock-free</span>
+                            <span>Atomics</span>
+                        </div>
+                        <a href="blog-threadweaver.html" class="blog-read-more">Read →</a>
+                    </div>
+                </article>
+
+                <article class="blog-card locked">
+                    <div class="blog-card-top">
+                        <span class="blog-icon">&#x1F916;</span>
+                        <div class="blog-card-meta">
+                            <span class="blog-category">AI / Research</span>
+                            <span class="blog-read-time">&#x1F512; Locked</span>
+                        </div>
+                    </div>
+                    <h2>Recursive-MAS MiniCPM</h2>
+                    <p class="blog-subtitle">Edge-Optimized Recursive Thinking</p>
+                    <p class="blog-excerpt">Edge-optimized recursive-thinking transformer with mixed linear/full attention architecture. Currently in active development — full technical details will be published after testing is complete.</p>
+                    <div class="blog-card-footer">
+                        <div class="tech-tags">
+                            <span>PyTorch</span>
+                            <span>Transformers</span>
+                            <span>Edge AI</span>
+                        </div>
+                        <span class="blog-locked-badge">Locked</span>
+                    </div>
+                </article>
+
+                <article class="blog-card">
+                    <div class="blog-card-top">
+                        <span class="blog-icon">&#x1F9F9;</span>
+                        <div class="blog-card-meta">
+                            <span class="blog-category">RL / MARL</span>
+                            <span class="blog-read-time">14 min read</span>
+                        </div>
+                    </div>
+                    <h2><a href="blog-cleaning-robot.html">Multi-Agent Cleaning Robot</a></h2>
+                    <p class="blog-subtitle">Cooperative Reinforcement Learning</p>
+                    <p class="blog-excerpt">UNSW COMP9414 project. Three agents learning to clean a 12×12 grid while avoiding fragile obstacles. Independent PPO, MAPPO with shared global critic, and a continuous episode variant.</p>
+                    <div class="blog-card-footer">
+                        <div class="tech-tags">
+                            <span>PyTorch</span>
+                            <span>PPO</span>
+                            <span>MAPPO</span>
+                        </div>
+                        <a href="blog-cleaning-robot.html" class="blog-read-more">Read →</a>
+                    </div>
+                </article>
+
+                <article class="blog-card">
+                    <div class="blog-card-top">
+                        <span class="blog-icon">&#x1F527;</span>
+                        <div class="blog-card-meta">
+                            <span class="blog-category">HPC / ML Infra</span>
+                            <span class="blog-read-time">8 min read</span>
+                        </div>
+                    </div>
+                    <h2><a href="blog-flexgemm.html">FlexGEMM — CPU Fallback</a></h2>
+                    <p class="blog-subtitle">Sparse 3D Convolutions on Any Hardware</p>
+                    <p class="blog-excerpt">Extending a Triton-powered GEMM backend with CPU support. Implementing coordinate-building kernels for hardware with limited GPU memory.</p>
+                    <div class="blog-card-footer">
+                        <div class="tech-tags">
+                            <span>Python</span>
+                            <span>Triton</span>
+                            <span>Sparse Conv</span>
+                        </div>
+                        <a href="blog-flexgemm.html" class="blog-read-more">Read →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

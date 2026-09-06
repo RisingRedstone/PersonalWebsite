@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Cleaning Robot — Blog | Pratham Gohil</title>
+    <meta name="description" content="Cooperative multi-agent RL system with Independent PPO and MAPPO implementations for a cleaning task in a 12×12 grid environment.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <article class="blog-post">
+        <div class="container">
+            <div class="blog-post-content">
+                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                
+                <header class="post-header">
+                    <span class="post-icon">&#x1F9F9;</span>
+                    <h1>Multi-Agent Cleaning Robot</h1>
+                    <p class="post-subtitle">Cooperative Reinforcement Learning with Independent PPO & MAPPO</p>
+                    <div class="post-meta">
+                        <span class="reading-time">&#x1F552; 14 min read</span>
+                        <span class="wip-badge">Work In Progress — No public repo yet</span>
+                    </div>
+                    <div class="tech-tags">
+                        <span>PyTorch</span>
+                        <span>Reinforcement Learning</span>
+                        <span>PPO</span>
+                        <span>MAPPO</span>
+                        <span>GAE</span>
+                        <span>Gym Environment</span>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <section id="overview">
+                        <h2>Overview</h2>
+                        <p>A cooperative multi-agent reinforcement learning system where three agents must learn to clean 24 dirt tiles on a 12×12 grid while avoiding 14 fragile obstacles — all within a 50-step time limit. The project implements both the Gym-style environment and two PPO variants (Independent PPO and Multi-Agent PPO) entirely from scratch in PyTorch.</p>
+                        <p>The challenge isn't just cleaning — it's <em>cooperative</em> cleaning. Agents must learn to partition the grid, avoid redundant coverage, and coordinate their movements without explicit communication. The fragile obstacles add a penalty dimension: stepping on one incurs a cost, so agents must learn spatial awareness alongside cooperation.</p>
+                    </section>
+
+                    <section id="environment">
+                        <h2>Environment Design</h2>
+                        
+                        <h3 id="grid-world">Grid World</h3>
+                        <p>The environment is a 12×12 grid with:</p>
+                        <ul>
+                            <li><strong>3 agents</strong> — Each with position, orientation, and a 5-channel observation</li>
+                            <li><strong>24 dirt tiles</strong> — Randomly placed; includes normal dirt (+2 reward) and heavy dirt (+4 reward). Cleaned when an agent moves onto them.</li>
+                            <li><strong>14 fragile obstacles</strong> — Stepping on one incurs a <strong>-20 penalty</strong>. Agents must learn spatial awareness alongside cooperation.</li>
+                            <li><strong>50-step episode limit</strong> — Forces efficient exploration. Early termination on full cleanup.</li>
+                        </ul>
+
+                        <h3 id="observation-space">Observation Space</h3>
+                        <p>Each agent receives a 5-channel 12×12 observation tensor:</p>
+                        <ol>
+                            <li>Fragile object locations</li>
+                            <li>Self-position (one-hot)</li>
+                            <li>Other agents' positions</li>
+                            <li>Explored history (visited tiles)</li>
+                            <li>Docking position marker</li>
+                        </ol>
+                        <p>The state tensor is formatted as <code>[batch, H, W, C]</code> and permuted to <code>[C, H, W]</code> for PyTorch Conv2d compatibility.</p>
+
+                        <h3 id="action-space">Action Space</h3>
+                        <p>5 discrete actions per agent: <strong>idle, up, down, left, right</strong>. Agents cannot move through obstacles or other agents. Boundary violations incur a -20 penalty.</p>
+
+                        <h3 id="reward-structure">Reward Structure</h3>
+                        <p>The reward function is carefully shaped to encourage efficient cooperative cleaning:</p>
+                        <ul>
+                            <li><strong>+2</strong> for cleaning a new tile (normal dirt)</li>
+                            <li><strong>+4</strong> for cleaning heavy dirt</li>
+                            <li><strong>-1</strong> for revisiting an already-cleaned tile</li>
+                            <li><strong>-0.1</strong> per timestep (time penalty)</li>
+                            <li><strong>-0.1</strong> for idle action (encourages movement)</li>
+                            <li><strong>-20</strong> for boundary/fragile object/inter-agent collision violation</li>
+                            <li><strong>+20</strong> completion bonus for cleaning all tiles</li>
+                        </ul>
+
+                        <h3 id="safety-layer">Safety Layer</h3>
+                        <p>A configurable safety enforcement layer (<code>use_safety=True/False</code>) detects boundary violations, fragile object collisions, and inter-agent collisions. When enabled, violations are blocked; when disabled, agents learn to avoid them through negative rewards.</p>
+
+                        <h3 id="visualization">Visualization</h3>
+                        <p>Matplotlib-based interactive renderer with colored zones, agent trails, per-agent exploration overlays, and dock markers. Useful for debugging learned policies and understanding agent coordination patterns.</p>
+                    </section>
+
+                    <section id="algorithms">
+                        <h2>Algorithm Implementations</h2>
+                        
+                        <h3 id="ippo">Independent PPO (I-PPO)</h3>
+                        <p>Each agent maintains its own policy network, value function, and trajectory buffer. Agents learn independently — there's no shared information during training. This is the simplest multi-agent RL approach and serves as a baseline.</p>
+                        <p><strong>Key details:</strong></p>
+                        <ul>
+                            <li>Per-agent trajectory buffers (no mixing)</li>
+                            <li>Independent advantage estimation via GAE</li>
+                            <li>Separate policy gradient updates per agent</li>
+                            <li>No communication between agents during training or inference</li>
+                            <li>Rollout buffer of 400 timesteps, 32 epochs over collected rollout, batch size 100</li>
+                            <li>Hyperparameters: <code>GAMMA=0.98</code>, <code>LAMBDA=0.97</code>, <code>ACTOR_LR=6e-4</code>, <code>CRITIC_LR=7e-4</code></li>
+                        </ul>
+
+                        <h3 id="mappo">Multi-Agent PPO (MAPPO)</h3>
+                        <p>MAPPO introduces a <strong>shared global critic</strong> while maintaining independent actor policies. The critic has access to the concatenated aggregated state space (all agents' observations), enabling it to learn a centralized value function that accounts for the joint state.</p>
+                        <p><strong>Key details:</strong></p>
+                        <ul>
+                            <li>Independent actors (one policy per agent)</li>
+                            <li>Shared global critic (centralized value function)</li>
+                            <li>Critic input: concatenated observations from all agents (fragile_map + self+other overlap + combined exploration + docking)</li>
+                            <li>Global critic provides shared value estimate used for GAE computation across all agents</li>
+                            <li>Shared critic updates from combined batch of all three agents' transitions</li>
+                            <li>Hyperparameters: <code>GAMMA=0.98</code>, <code>LAMBDA=0.97</code>, <code>EPSILON=0.15</code>, <code>ACTOR_LR=5e-4</code>, <code>CRITIC_LR=6e-4</code></li>
+                        </ul>
+                        <p>The hypothesis is that MAPPO should outperform I-PPO because the centralized critic can learn the cooperative structure of the task — understanding that agents cleaning different regions is better than redundant coverage.</p>
+
+                        <h3 id="continuous-variant">Continuous Episode Variant</h3>
+                        <p>A third variant that runs until the episode naturally terminates (all dirt cleaned) instead of using a fixed 400-step rollout buffer. This demonstrates the trade-off between fixed-horizon and natural-termination collection strategies.</p>
+                        <p><strong>Key differences:</strong></p>
+                        <ul>
+                            <li>Includes GAE normalization step (zero-mean, unit-variance per mini-batch) before PPO update</li>
+                            <li>Uses <code>torch.nn.functional</code> for MSE loss and categorical distributions directly instead of manual log-ratio computation</li>
+                            <li>Better suited for environments with variable episode lengths</li>
+                        </ul>
+
+                        <details>
+                            <summary>PPO Core (Shared Across All Variants)</summary>
+                            <ul>
+                                <li>Clipped surrogate objective with <code>ε = 0.15</code></li>
+                                <li>Value loss coefficient <code>c₁ = 0.5</code></li>
+                                <li>Entropy bonus coefficient <code>c₂ = 0.03</code> (encourages exploration)</li>
+                                <li>Generalized Advantage Estimation (GAE) with <code>γ = 0.98</code>, <code>λ = 0.97</code></li>
+                                <li>Rollout buffer collection with fixed-horizon or continuous episode natural termination</li>
+                            </ul>
+                        </details>
+                    </section>
+
+                    <section id="architecture">
+                        <h2>Network Architecture</h2>
+                        
+                        <h3 id="cnn-networks">CNN Policy Networks</h3>
+                        <p>The primary architecture uses convolutional layers to process the spatial grid observation:</p>
+                        <ul>
+                            <li><strong>Actor:</strong> <code>Conv2d(5 → 6, kernel=3, dilation=2)</code> → <code>Conv2d(6 → 8, kernel=5)</code> → Flatten → <code>Linear(128 → 64 → 64 → 5)</code> with GELU activations → Softmax over 5 actions</li>
+                            <li><strong>Per-Agent Critic (I-PPO):</strong> Same CNN backbone as actor, <code>Linear(128 → 64 → 64 → 64 → 1)</code> outputting scalar state-value</li>
+                            <li><strong>Global Critic (MAPPO):</strong> <code>Conv2d(4 → 6, dilation=2)</code> + <code>Conv2d(6 → 8, 5)</code> → Flatten → <code>Linear(128 → 64 → 1)</code>; takes concatenated global state (fragile + overlap of self+others + combined explore mask + docking)</li>
+                        </ul>
+                        <p>The dilated convolution (dilation=2) is critical — it allows the network to "see" a larger receptive field without increasing parameters, important for a 12×12 grid where agents need global awareness.</p>
+
+                        <h3 id="fc-baselines">Fully-Connected Ablation Models</h3>
+                        <p>As a baseline comparison, fully-connected networks (<code>ActorRec</code> / <code>CriticRec</code>) were also implemented: raw flatten(12×12×5=720) → <code>Linear(720 → 128 → 64 → 64 → 5/1)</code>. This measures the value of spatial inductive bias in this task.</p>
+                    </section>
+
+                    <section id="training">
+                        <h2>Training Infrastructure</h2>
+                        <ul>
+                            <li><strong>Batch shuffling:</strong> Custom <code>shuffled_batch_generator</code> produces shuffled mini-batches for stochastic gradient updates</li>
+                            <li><strong>GPU-accelerated training:</strong> CUDA device placement with <code>torch.permute</code> for channel-first convention</li>
+                            <li><strong>Checkpoint save/load:</strong> Automatic with <code>torch.save()</code> / <code>torch.load(weights_only=True)</code> for safe weight restoration</li>
+                            <li><strong>Metric logging:</strong> Reward curves, entropy, clip loss, value loss — exported as NumPy arrays and plotted via matplotlib with tab10 colormap</li>
+                            <li><strong>Per-agent checkpoints:</strong> Saved as <code>ippo_actor_random_{id}.pt</code>, <code>ippo_critic_random_{id}.pt</code></li>
+                        </ul>
+                    </section>
+
+                    <section id="lessons">
+                        <h2>Lessons Learned</h2>
+                        <ul>
+                            <li><strong>GAE normalization matters.</strong> Without zero-mean/unit-variance normalization of advantages, training is unstable and diverges quickly. This is especially true in multi-agent settings where reward scales can vary dramatically between agents.</li>
+                            <li><strong>Entropy scheduling is non-trivial.</strong> Too much entropy → agents wander randomly. Too little → agents converge to "stay still" (safe but useless). A decay schedule works better than a fixed coefficient.</li>
+                            <li><strong>Centralized critics aren't magic.</strong> MAPPO's shared critic requires careful architecture — if the concatenated state space is too large, the critic overfits. Dimensionality reduction or attention mechanisms might help.</li>
+                            <li><strong>Environment design is 80% of the work.</strong> Getting the reward function right (balancing cleaning reward vs. obstacle penalty vs. time penalty) took more iteration than the RL algorithms themselves.</li>
+                            <li><strong>CNNs beat MLPs for spatial tasks.</strong> The dilated convolution architecture significantly outperforms the fully-connected baseline, confirming that spatial inductive bias matters even in small grid worlds.</li>
+                        </ul>
+                    </section>
+
+                    <section class="related-projects">
+                        <h2>Related Projects</h2>
+                        <div class="related-grid">
+                            <a href="blog-recursivemas.html" class="related-card">
+                                <span>&#x1F916;</span>
+                                <div>
+                                    <strong>Recursive-MAS MiniCPM</strong>
+                                    <p>Multi-agent RL meets transformer architectures</p>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="post-toc">
+                <h4 class="toc-title">On this page</h4>
+                <ul class="toc-list">
+                    <li><a href="#overview">Overview</a></li>
+                    <li>
+                        <a href="#environment">Environment Design</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#grid-world">Grid World</a></li>
+                            <li class="toc-h3"><a href="#observation-space">Observation Space</a></li>
+                            <li class="toc-h3"><a href="#reward-structure">Reward Structure</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#algorithms">Algorithms</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#ippo">Independent PPO</a></li>
+                            <li class="toc-h3"><a href="#mappo">MAPPO</a></li>
+                            <li class="toc-h3"><a href="#continuous-variant">Continuous Variant</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#architecture">Network Architecture</a>
+                        <ul class="toc-list">
+                            <li class="toc-h3"><a href="#cnn-networks">CNN Policy Networks</a></li>
+                            <li class="toc-h3"><a href="#fc-baselines">FC Baselines</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#training">Training Infrastructure</a></li>
+                    <li><a href="#lessons">Lessons Learned</a></li>
+                </ul>
+            </aside>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('readingProgress').style.width = scrolled + '%';
+        });
+
+        const tocLinks = document.querySelectorAll('.toc-list a');
+        const sections = document.querySelectorAll('.post-content section[id], .post-content h3[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) current = section.getAttribute('id');
+            });
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
