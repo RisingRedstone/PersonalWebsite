@@ -4,49 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pratham Gohil — AI & Systems Engineer</title>
-    <meta name="description" content="Pratham Gohil — Master of IT (AI) at UNSW. Building at the intersection of AI/ML research and high-performance systems.">
+    <meta name="description" content="Pratham Gohil: Master of IT (AI) at UNSW Sydney. Lock-free C++ infrastructure, GPU kernels, and multimodal and multi-agent AI.">
+    <meta name="theme-color" content="#0d0c0a">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+
+    <nav class="navbar" id="navbar" aria-label="Primary">
         <div class="nav-container">
             <a href="#hero" class="nav-logo">PG</a>
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#about">About</a></li>
+                <li><a href="#work">Work</a></li>
                 <li><a href="#now">Now</a></li>
                 <li><a href="#experience">Experience</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#publications">Publications</a></li>
+                <li><a href="blog.html">Writing</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li><a href="blog.html">Blog</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <main id="main-content">
+    <!-- Hero -->
     <section class="hero" id="hero">
-        <div class="hero-bg" aria-hidden="true"></div>
         <div class="hero-grid container">
             <div class="hero-content">
                 <p class="hero-eyebrow"><span></span> AI / SYSTEMS / RESEARCH</p>
-                <p class="hero-greeting">Hello, I'm</p>
                 <h1 class="hero-name">Pratham<br><em>Gohil</em></h1>
                 <p class="hero-positioning">I build efficient intelligent systems — from lock-free C++ infrastructure to multimodal and multi-agent AI.</p>
                 <p class="hero-subtitle">Master of IT (AI) at UNSW Sydney, working across AI research, high-performance computing, and low-level systems engineering.</p>
                 <div class="hero-cta">
-                    <a href="#projects" class="btn btn-primary">View Projects <span aria-hidden="true">↗</span></a>
-                    <a href="#contact" class="btn btn-outline">Get in Touch</a>
+                    <a href="#work" class="btn btn-primary">Selected work <span aria-hidden="true">↓</span></a>
+                    <a href="#contact" class="btn btn-outline">Get in touch</a>
                 </div>
                 <div class="hero-links">
                     <a href="https://github.com/RisingRedstone" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
@@ -54,489 +50,359 @@
                     <a href="mailto:prathamgohil751@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.72a3 3 0 00-3-3h-15a3 3 0 00-3 3v.188l8.928 5.493a3 3 0 003.144 0l8.928-5.493z"/></svg></a>
                 </div>
             </div>
-            <div class="hero-system" aria-label="Abstract systems architecture diagram">
-                <div class="system-label system-label-top"><span class="status-dot"></span> LIVE SYSTEMS VIEW</div>
-                <svg class="system-diagram threadweaver-demo" viewBox="0 0 560 560" role="img" aria-label="A producer process on core 3 writes data to a shared lock-free ring buffer, and a consumer process on core 2 reads from it">
-                    <defs>
-                        <pattern id="heroGrid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0 L0 0 0 32" fill="none" stroke="currentColor" stroke-width="1" opacity=".16"/></pattern>
-                        <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="currentColor"/></marker>
-                    </defs>
-                    <rect width="560" height="540" fill="url(#heroGrid)"/>
-                    <text class="diagram-caption" x="34" y="42">PROCESS A</text><text class="diagram-caption" x="34" y="57">PRODUCER / CORE 3</text>
-                    <text class="diagram-caption" x="414" y="42">PROCESS B</text><text class="diagram-caption" x="414" y="57">CONSUMER / CORE 2</text>
-                    <g class="core-box" transform="translate(28 78)"><rect width="118" height="82" rx="3"/><text class="diagram-core-title" x="14" y="24">CORE 3</text><text class="diagram-micro" x="14" y="46">producer.write()</text><text class="diagram-micro" x="14" y="63">local w_h_cache</text></g>
-                    <g class="core-box" transform="translate(414 78)"><rect width="118" height="82" rx="3"/><text class="diagram-core-title" x="14" y="24">CORE 2</text><text class="diagram-micro" x="14" y="46">consumer.read()</text><text class="diagram-micro" x="14" y="63">local r_h_cache</text></g>
-                    <path class="diagram-line diagram-line-accent" d="M87 160 V190" stroke-width="2" marker-end="url(#arrowHead)"/><text class="diagram-caption flow-caption" x="98" y="178">WRITE DATA</text>
-                    <g class="shared-memory" transform="translate(82 190)"><rect class="diagram-panel" width="396" height="146" rx="4"/><text class="diagram-caption" x="20" y="26">SHARED MEMORY · CACHE-LINE ALIGNED</text><text class="diagram-micro" x="20" y="43">one shared mapping · data slots are written before publication</text><g class="buffer-cells" transform="translate(20 64)"><rect width="54" height="42"/><rect x="60" width="54" height="42"/><rect class="buffer-cell-active" x="120" width="54" height="42"/><rect x="180" width="54" height="42"/><rect x="240" width="54" height="42"/><rect x="300" width="56" height="42"/><text x="27" y="26" text-anchor="middle">r+0</text><text x="87" y="26" text-anchor="middle">r+1</text><text x="147" y="26" text-anchor="middle">w</text><text x="207" y="26" text-anchor="middle">w+1</text><text x="267" y="26" text-anchor="middle">…</text><text x="328" y="26" text-anchor="middle">free</text></g><text class="diagram-micro" x="20" y="128">data[w] = item  →  publish index  →  item = data[r]</text></g>
-                    <path class="diagram-line diagram-line-accent" d="M473 336 V160" stroke-width="2" marker-end="url(#arrowHead)"/><text class="diagram-caption flow-caption" x="378" y="178">READ DATA</text>
-                    <circle id="writePacket" class="packet packet-write" cx="87" cy="174" r="5"/><circle id="readPacket" class="packet packet-read" cx="473" cy="350" r="5"/>
-                </svg>
-                <div class="system-label system-label-bottom">THREADWEAVER / 01 <span>STATUS: ONLINE</span></div>
-            </div>
+            <figure class="tw tw-compact" data-tw-anim="compact">
+                <div class="tw-bar"><span><span class="status-dot" aria-hidden="true"></span>THREADWEAVER · SCSP RING BUFFER</span><span class="tw-scene" aria-hidden="true"></span></div>
+                <div class="tw-stage">
+                    <p class="tw-fallback">A producer process on core 3 and a consumer process on core 2 pass data through a lock-free ring buffer in shared memory. Enable JavaScript to see it animated.</p>
+                </div>
+                <figcaption class="tw-caption">Model of <code>simple_approach.hpp</code> with 8 slots, slowed down billions of times. Not a benchmark.</figcaption>
+            </figure>
         </div>
         <div class="hero-metrics" aria-label="Selected metrics">
-            <div><strong>1.25B</strong><span>ops/sec · SCSP</span></div>
-            <div><strong>650M</strong><span>ops/sec · matching engine</span></div>
-            <div><strong>18</strong><span>public repositories</span></div>
-            <div><strong>1</strong><span>peer-reviewed publication</span></div>
-        </div>
-        <div class="scroll-indicator">
-            <span></span>
+            <div><strong>1.25B</strong><span>ops/sec · single producer, single consumer</span></div>
+            <div><strong>650M</strong><span>ops/sec · 8 producers, 1 consumer</span></div>
+            <div><strong>19</strong><span>public GitHub repositories</span></div>
+            <div><strong>1</strong><span>peer-reviewed paper · ICVGIP '24</span></div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="section" id="about">
+    <!-- Intro -->
+    <section class="section intro" id="about">
         <div class="container">
-            <h2 class="section-title">About Me</h2>
-            <div class="about-grid">
-                <div class="about-text">
-                    <p>I'm a <strong>Master of IT (AI Specialization)</strong> student at UNSW Sydney with a deep passion for building systems that push the boundaries of what's possible — from billion-ops-per-second concurrent data structures to multi-agent reinforcement learning environments.</p>
-                    <p>My work spans the full spectrum: I write CUDA kernels for GPU-accelerated rendering, design lock-free concurrency primitives in C++23, implement neural networks from scratch in PyTorch, and architect production-grade async data pipelines. I believe the most interesting engineering happens at the intersection of AI and systems.</p>
-                    <p>Previously, I completed my B.Tech in Computer Science at SRM Institute, where I published research on vision-based danger assessment at ICVGIP '24 and won multiple hackathons. I've built everything from matching engines benchmarked at 650M ops/sec to edge-optimized recursive-thinking LLMs.</p>
-                </div>
-                <div class="about-stats">
-                    <div class="stat-card">
-                        <span class="stat-number">18</span>
-                        <span class="stat-label">GitHub Repos</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number">1</span>
-                        <span class="stat-label">Publication</span>
-                    </div>
+            <div class="section-head">
+                <span class="section-no">§ 00</span>
+                <h2 class="section-title">Overview</h2>
+            </div>
+            <div class="section-head" style="margin-bottom:0">
+                <span></span>
+                <div>
+                    <p>I'm a Master of IT (AI) student at UNSW Sydney. I work on both halves of an AI system: the infrastructure underneath (lock-free C++23 queues, shared-memory allocators, GPU kernels) and the models on top, which I usually write from scratch to understand them at the tensor level.</p>
+                    <p>Before UNSW I did a B.Tech in Computer Science at SRM Institute, published a vision-language safety paper at ICVGIP '24, and placed in four competitions.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Experience Section -->
-    <section class="section section-alt" id="experience">
+    <!-- Selected work -->
+    <section class="section" id="work">
         <div class="container">
-            <h2 class="section-title">Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h3>Commotion Software Solutions</h3>
-                            <span class="timeline-date">Jan 2025 – Jul 2025</span>
-                        </div>
-                        <p class="timeline-role">Python Developer — LLMs & Systems Integration</p>
-                        <p>Developed a scalable integration framework converting n8n workflows into a production-grade platform supporting 300+ third-party services. Built a semi-automated conversion pipeline combining a custom Python AST parser with LLM-driven generation, reducing hallucinations by 28% through prompt engineering and post-checks.</p>
-                        <div class="tech-tags">
-                            <span>Python</span><span>LLMs</span><span>AST Parsing</span><span>n8n</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h3>Next Tech Lab</h3>
-                            <span class="timeline-date">Sep 2023 – May 2025</span>
-                        </div>
-                        <p class="timeline-role">AI Researcher — HPC & Neural Architectures</p>
-                        <p>Researched Kolmogorov–Arnold Networks (KANs) and spline-based architectures for efficient function approximation. Prototyped VAEs and Vision-Language Models for multimodal tasks. Conducted weekly technical seminars on state-of-the-art research.</p>
-                        <div class="tech-tags">
-                            <span>KANs</span><span>VAEs</span><span>VLMs</span><span>PyTorch</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h3>Odyssey Lab Cohort</h3>
-                            <span class="timeline-date">Jan 2024 – Jan 2025</span>
-                        </div>
-                        <p class="timeline-role">AI Researcher — Multimodal Risk Analysis</p>
-                        <p>Designed a vision-language scoring engine using CLIP image embeddings + BERT text embeddings. Implemented Grad-CAM interpretability for safety-critical feature visualization. Led annotation effort with 18 evaluators to build a 100+ video multimodal dataset.</p>
-                        <div class="tech-tags">
-                            <span>CLIP</span><span>BERT</span><span>Grad-CAM</span><span>Multimodal AI</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h3>Nitesh Fashion Pvt Ltd</h3>
-                            <span class="timeline-date">Jul 2025 – Sep 2025</span>
-                        </div>
-                        <p class="timeline-role">Software Developer — Full-Stack</p>
-                        <p>Built an internal catalogue distribution platform using React Native + Rust (Axum) backend. Implemented dynamic pricing logic for per-customer negotiated wholesale adjustments and WhatsApp-based catalogue delivery workflows.</p>
-                        <div class="tech-tags">
-                            <span>React Native</span><span>Rust</span><span>Axum</span><span>WhatsApp API</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <h3>ANS IT INDIA</h3>
-                            <span class="timeline-date">Jul 2021 – Sep 2021</span>
-                        </div>
-                        <p class="timeline-role">iOS App Developer</p>
-                        <p>Built a BLE-enabled iOS app for item tracking with Firebase Auth integration and low-power BLE handling.</p>
-                        <div class="tech-tags">
-                            <span>iOS</span><span>Swift</span><span>BLE</span><span>Firebase</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="section-head">
+                <span class="section-no">§ 01</span>
+                <h2 class="section-title">Selected work</h2>
+                <p class="section-lede">Three projects in depth, then everything else I've built.</p>
             </div>
-        </div>
-    </section>
 
-    <!-- Projects Section -->
-    <section class="section" id="projects">
-        <div class="container">
-            <h2 class="section-title">Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card featured">
-                    <div class="project-card-header">
-                        <span class="project-icon project-icon-systems" aria-hidden="true">↔</span>
-                        <h3><a href="blog-threadweaver.html">Threadweaver Core</a></h3>
-                    </div>
-                    <div class="project-meta"><span class="project-status">Complete</span><span>Systems · 2025</span></div>
-                    <p class="project-desc">Ultra-high-throughput concurrency primitives achieving peak SCSP throughput of 1.25B ops/sec. Features cache-saturating ring buffers, lock-free MPSC protocols, 2MB Huge Pages, and compile-time safety via C++20 concepts.</p>
-                    <div class="tech-tags">
-                        <span>C++23</span><span>Lock-free</span><span>Atomics</span><span>Huge Pages</span>
-                    </div>
-                    <div class="project-actions"><a href="blog-threadweaver.html">Technical write-up →</a><a href="https://github.com/RisingRedstone" target="_blank" rel="noopener">GitHub ↗</a></div>
-                </div>
-
-                <div class="project-card featured">
-                    <div class="project-card-header">
-                        <span class="project-icon project-icon-systems" aria-hidden="true">▦</span>
-                        <h3><a href="blog-threadweaver.html">Matching Engine</a></h3>
-                    </div>
-                    <p class="project-desc">Ultra-low latency matching engine benchmarked at 650M ops/sec (8 producers × 1 consumer). Zero-mutex design using hardware-first primitives — inline <code>cmov</code>, atomic <code>lock bts</code>, cache-line-aligned containers.</p>
-                    <div class="tech-tags">
-                        <span>C++23</span><span>HPC</span><span>Callgrind</span><span>Branchless</span>
-                    </div>
-                    <div class="project-actions"><a href="blog-threadweaver.html">Technical write-up →</a><a href="https://github.com/RisingRedstone" target="_blank" rel="noopener">GitHub ↗</a></div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon project-icon-ai" aria-hidden="true">◎</span>
-                        <h3>Recursive-MAS MiniCPM</h3>
-                    </div>
-                    <div class="project-meta"><span class="project-status status-private">Private</span><span>AI research · Active</span></div>
-                    <p class="project-desc">Edge-optimized recursive-thinking multi-agent system. Custom Qwen3.5-based transformer with mixed attention (linear + full), Grouped Query Attention (4× KV cache reduction), and DCT-based weight compression.</p>
-                    <div class="tech-tags">
-                        <span>PyTorch</span><span>Transformers</span><span>GQA</span><span>RoPE</span>
+            <article class="work-item">
+                <span class="work-no">01 / SYSTEMS</span>
+                <div class="work-body">
+                    <span class="status-badge">Complete · engine in progress</span>
+                    <h3><a href="blog-threadweaver.html">Threadweaver: messaging for a matching engine</a></h3>
+                    <p>Moving data between threads is limited by cache coherence, not arithmetic. Threadweaver is a family of lock-free ring buffers in C++23, with every head on its own 64-byte cache line, power-of-two mask indexing, and 2&nbsp;MB huge-page shared memory.</p>
+                    <p>It is the foundation of a matching engine I am building: the buffers and allocators are done and benchmarked at 1.25B ops/sec with one producer and 650M ops/sec with eight, without a single mutex. The matching logic on top is next.</p>
+                    <div class="tags"><span>C++23</span><span>lock-free</span><span>atomics</span><span>huge pages</span><span>callgrind</span></div>
+                    <div class="work-links">
+                        <a class="link-arrow" href="blog-threadweaver.html">Technical write-up →</a>
+                        <a class="link-arrow" href="blog-matching-engine.html">Engine status →</a>
+                        <a class="link-arrow" href="https://github.com/RisingRedstone/Matching-Engine-Threadweaver" target="_blank" rel="noopener">Source ↗</a>
                     </div>
                 </div>
+                <figure class="work-visual">
+                    <svg viewBox="0 0 420 170" role="img" aria-labelledby="bench-t bench-d">
+                        <title id="bench-t">Ring buffer throughput by configuration</title>
+                        <desc id="bench-d">Bar chart. Single producer, single consumer: 1.25 billion operations per second. Eight producers, one consumer: 650 million operations per second.</desc>
+                        <text class="v-dim" x="0" y="14">PEAK THROUGHPUT, OPS/SEC</text>
+                        <text class="v-txt" x="0" y="48">1P · 1C (SCSP)</text>
+                        <rect class="v-bar" x="0" y="56" width="400" height="22"/>
+                        <text class="v-num" x="404" y="48" text-anchor="end">1.25B</text>
+                        <text class="v-txt" x="0" y="112">8P · 1C</text>
+                        <rect class="v-bar-2" x="0" y="120" width="208" height="22"/>
+                        <text class="v-num" x="212" y="112" text-anchor="start" style="fill:var(--text)">650M</text>
+                    </svg>
+                    <figcaption>Ring-buffer throughput by configuration. SCSP = single producer, single consumer.</figcaption>
+                </figure>
+            </article>
 
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon project-icon-rl" aria-hidden="true">⌁</span>
-                        <h3><a href="blog-cleaning-robot.html">Multi-Agent Cleaning Robot</a></h3>
-                    </div>
-                    <p class="project-desc">Cooperative multi-agent RL system with three agents cleaning a 12×12 grid. Implemented Independent PPO and MAPPO with shared global critic, GAE advantage estimation, and custom CNN policy networks from scratch.</p>
-                    <div class="tech-tags">
-                        <span>PyTorch</span><span>RL</span><span>PPO</span><span>MAPPO</span>
+            <article class="work-item">
+                <span class="work-no">02 / ML INFRA</span>
+                <div class="work-body">
+                    <span class="status-badge status-active">Active</span>
+                    <h3><a href="blog-flexgemm.html">FlexGEMM: CPU fallback</a></h3>
+                    <p>Running TRELLIS&nbsp;2 ran me out of VRAM, and FlexGEMM's sparse 3D convolution backend only had GPU kernels for building output coordinates. I'm writing CPU versions so it works on machines with little or no GPU memory.</p>
+                    <p>Both output-coordinate kernels now have native C++17/OpenMP CPU versions. They return exactly the same coordinates as PyTorch's reference path and run 40–400× faster on my 8-thread laptop CPU. The submanifold neighbour map still runs through a PyTorch fallback; a native kernel is next.</p>
+                    <div class="tags"><span>C++17</span><span>OpenMP</span><span>PyTorch</span><span>Triton</span><span>sparse conv</span></div>
+                    <div class="work-links">
+                        <a class="link-arrow" href="blog-flexgemm.html">Technical write-up →</a>
+                        <a class="link-arrow" href="https://github.com/RisingRedstone/FlexGEMM" target="_blank" rel="noopener">Fork ↗</a>
                     </div>
                 </div>
+                <figure class="work-visual">
+                    <svg viewBox="0 0 420 170" role="img" aria-labelledby="flex-t flex-d">
+                        <title id="flex-t">CPU fallback kernel status</title>
+                        <desc id="flex-d">Two output-coordinate kernels have native CPU implementations that match the PyTorch reference. The submanifold neighbour map still uses a PyTorch fallback.</desc>
+                        <text class="v-dim" x="0" y="14">CPU KERNEL STATUS</text>
+                        <rect class="v-cool" x="0" y="26" width="420" height="40"/>
+                        <text class="v-txt" x="10" y="43">hashmap_build_sparse_conv_out_coords</text>
+                        <text class="v-dim" x="10" y="58" style="fill:var(--green)">NATIVE C++ · MATCHES REFERENCE</text>
+                        <rect class="v-cool" x="0" y="72" width="420" height="40"/>
+                        <text class="v-txt" x="10" y="89">expand_unique_build_sparse_conv_out_coords</text>
+                        <text class="v-dim" x="10" y="104" style="fill:var(--green)">NATIVE C++ · MATCHES REFERENCE</text>
+                        <rect class="v-hot" x="0" y="118" width="420" height="40"/>
+                        <text class="v-txt" x="10" y="135">submanifold neighbour map</text>
+                        <text class="v-dim" x="10" y="150" style="fill:var(--accent)">PYTORCH FALLBACK · NATIVE KERNEL NEXT</text>
+                    </svg>
+                    <figcaption>Coordinate-building kernels ported from CUDA to CPU. Speed-ups are against the pure-PyTorch reference, not the GPU.</figcaption>
+                </figure>
+            </article>
 
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon project-icon-systems" aria-hidden="true">∿</span>
-                        <h3><a href="blog-flexgemm.html">FlexGEMM — CPU Fallback</a></h3>
-                    </div>
-                    <p class="project-desc">Extending a Triton-powered GEMM backend for 3D sparse convolutions with CPU fallback support. Implementing coordinate-building kernels for hardware with limited GPU memory.</p>
-                    <div class="tech-tags">
-                        <span>Python</span><span>Triton</span><span>Sparse Conv</span><span>PyTorch</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon">&#x1F310;</span>
-                        <h3>Hierarchical Web Scraper</h3>
-                    </div>
-                    <p class="project-desc">Compute-efficient multi-agent scraping framework using a hierarchy of small LLMs (3B–12B params). Orchestrator → filter → coder pipeline with dynamic script generation.</p>
-                    <div class="tech-tags">
-                        <span>Python</span><span>LLMs</span><span>Multi-Agent</span><span>Scraping</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon">&#x26A1;</span>
-                        <h3>CPDP — Energy Recommender</h3>
-                    </div>
-                    <p class="project-desc">Consumer energy plan recommender ingesting Australian retailer data via CDR registry. Three-stage async ETL pipeline, custom TOU parser handling 6+ text formats, coverage verification engine.</p>
-                    <div class="tech-tags">
-                        <span>Python</span><span>Async</span><span>ETL</span><span>Energy</span>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-card-header">
-                        <span class="project-icon">&#x1F3A8;</span>
-                        <h3>Mandelbrot CUDA</h3>
-                    </div>
-                    <p class="project-desc">Real-time Mandelbrot set renderer achieving 60+ FPS at 1024×720 on RTX 3050 Ti. GPU-accelerated with custom CUDA kernels.</p>
-                    <div class="tech-tags">
-                        <span>CUDA</span><span>C++</span><span>GPU</span><span>Real-time</span>
-                    </div>
-                </div>
-            </div>
-            <div class="projects-more">
-                <a href="https://github.com/RisingRedstone" target="_blank" rel="noopener" class="btn btn-outline">View All on GitHub →</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Currently Working On Section -->
-    <section class="section section-alt" id="now">
-        <div class="container">
-            <h2 class="section-title">Currently Working On</h2>
-            <div class="now-grid">
-                <div class="now-card locked">
-                    <div class="now-card-header">
-                        <span class="now-status">&#x1F512;</span>
-                        <span class="now-label locked-label">Locked</span>
-                    </div>
+            <article class="work-item">
+                <span class="work-no">03 / AI RESEARCH</span>
+                <div class="work-body">
+                    <span class="status-badge status-private">Private · Active</span>
                     <h3>Recursive-MAS MiniCPM</h3>
-                    <p>Edge-optimized recursive-thinking transformer with mixed linear/full attention architecture. Implementing custom MiniCPM V4.6 from scratch with Grouped Query Attention and DCT-based weight compression. Currently in active development — full details will be published after testing.</p>
-                    <div class="tech-tags">
-                        <span>PyTorch</span><span>Transformers</span><span>Edge AI</span>
+                    <p>A recursive-thinking multi-agent system aimed at cutting the tokens a model spends thinking, so inference gets faster on edge devices. First step: a Qwen3.5-based transformer in plain PyTorch, with no Hugging Face Transformers, so every tensor is visible.</p>
+                    <p>Three of every four layers use linear attention (gated delta rule, roughly O(N)), and grouped-query attention shrinks the KV cache 4×. Next up: DCT analysis for weight compression.</p>
+                    <div class="tags"><span>PyTorch</span><span>linear attention</span><span>GQA</span><span>RoPE</span></div>
+                    <div class="work-links">
+                        <span class="link-private">Write-up locked until testing finishes</span>
                     </div>
                 </div>
-                <div class="now-card active">
-                    <div class="now-card-header">
-                        <span class="now-status">&#x1F7E2;</span>
-                        <span class="now-label">Active</span>
-                    </div>
-                    <h3><a href="blog-flexgemm.html">FlexGEMM — CPU Fallback</a></h3>
-                    <p>Implementing CPU fallback kernels for a Triton-powered sparse 3D convolution backend. Two of three kernels verified. Currently optimizing the submanifold convolution neighbour map (~10x slower than GPU path).</p>
-                    <div class="tech-tags">
-                        <span>Python</span><span>Triton</span><span>CPU Kernels</span>
-                    </div>
+                <figure class="work-visual">
+                    <svg viewBox="0 0 420 170" role="img" aria-labelledby="mas-t mas-d">
+                        <title id="mas-t">Layer layout of the text backbone</title>
+                        <desc id="mas-d">Twenty-four transformer layers. Every fourth layer uses full attention; the other three use linear attention.</desc>
+                        <text class="v-dim" x="0" y="14">24 LAYERS · 3 LINEAR : 1 FULL</text>
+                        <g><rect class="v-box" x="0.0" y="24" width="15" height="30"/><rect class="v-box" x="17.4" y="24" width="15" height="30"/><rect class="v-box" x="34.8" y="24" width="15" height="30"/><rect class="v-hot" x="52.2" y="24" width="15" height="30"/><rect class="v-box" x="69.6" y="24" width="15" height="30"/><rect class="v-box" x="87.0" y="24" width="15" height="30"/><rect class="v-box" x="104.4" y="24" width="15" height="30"/><rect class="v-hot" x="121.8" y="24" width="15" height="30"/><rect class="v-box" x="139.2" y="24" width="15" height="30"/><rect class="v-box" x="156.6" y="24" width="15" height="30"/><rect class="v-box" x="174.0" y="24" width="15" height="30"/><rect class="v-hot" x="191.4" y="24" width="15" height="30"/><rect class="v-box" x="208.8" y="24" width="15" height="30"/><rect class="v-box" x="226.2" y="24" width="15" height="30"/><rect class="v-box" x="243.6" y="24" width="15" height="30"/><rect class="v-hot" x="261.0" y="24" width="15" height="30"/><rect class="v-box" x="278.4" y="24" width="15" height="30"/><rect class="v-box" x="295.8" y="24" width="15" height="30"/><rect class="v-box" x="313.2" y="24" width="15" height="30"/><rect class="v-hot" x="330.6" y="24" width="15" height="30"/><rect class="v-box" x="348.0" y="24" width="15" height="30"/><rect class="v-box" x="365.4" y="24" width="15" height="30"/><rect class="v-box" x="382.8" y="24" width="15" height="30"/><rect class="v-hot" x="400.2" y="24" width="15" height="30"/></g>
+                        <rect class="v-box" x="0" y="64" width="14" height="14"/>
+                        <text class="v-dim" x="22" y="75">linear attention, gated delta rule</text>
+                        <rect class="v-hot" x="0" y="86" width="14" height="14"/>
+                        <text class="v-dim" x="22" y="97">full attention, GQA 8 query / 2 KV heads</text>
+                        <text class="v-num" x="0" y="150">4×</text>
+                        <text class="v-dim" x="52" y="146">smaller KV cache</text>
+                    </svg>
+                    <figcaption>Text backbone layout. Vision tower not yet implemented.</figcaption>
+                </figure>
+            </article>
+
+            <div class="also-built">
+                <h3>Also built</h3>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th scope="col">Project</th><th scope="col">Stack</th><th scope="col">What it shows</th><th scope="col">Link</th></tr></thead>
+                        <tbody>
+                            <tr><td>Multi-Agent Cleaning Robot</td><td class="mono">PyTorch · PPO</td><td>Three agents clean 24 dirt tiles on a 12×12 grid in 50 steps. Environment, Independent PPO and MAPPO with a shared critic, all from scratch. UNSW coursework.</td><td><a href="blog-cleaning-robot.html">Write-up</a></td></tr>
+                            <tr><td>CPDP energy recommender</td><td class="mono">Python · async · SQL</td><td>Fetches ~78 Australian retailers' plans (~28&nbsp;MB) and parses free-text time-of-use tariffs. Next: compare plans with a Fourier method. Private.</td><td class="mono">Private</td></tr>
+                            <tr><td>Hierarchical web scraper</td><td class="mono">Python · local LLMs</td><td>A 9B model orchestrates, a 4B model filters DOM chunks, a coder agent writes the extraction script.</td><td class="mono">—</td></tr>
+                            <tr><td>KAN implementation</td><td class="mono">TensorFlow</td><td>B-spline Kolmogorov–Arnold layers: 96% on MNIST with a 35% smaller model after pruning.</td><td><a href="https://github.com/RisingRedstone/KAN-Implementation" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                            <tr><td>Mandelbrot &amp; superpixels</td><td class="mono">CUDA · C++</td><td>Real-time Mandelbrot at 60+ FPS (1024×720, RTX 3050 Ti); GPU SLIC, SEEDS and Felzenszwalb variants.</td><td><a href="https://github.com/RisingRedstone/MandlebrotsetCUDA1" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                            <tr><td>Random collision detector</td><td class="mono">C++ · CUDA</td><td>Lagrange-multiplier grid optimisation; scaling stays linear up to 20K objects.</td><td><a href="https://github.com/RisingRedstone/RandomCollisionDetector" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                            <tr><td>A3C-Pong &amp; RL from scratch</td><td class="mono">Python</td><td>REINFORCE and A3C implemented without RL libraries; A3C trained on Atari Pong.</td><td><a href="https://github.com/RisingRedstone/A3C-Pong" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                            <tr><td>Health-Copilot</td><td class="mono">Python</td><td>Doctor–patient copilot that catalogues the conversation, suggests diagnoses and summarises the visit.</td><td><a href="https://github.com/RisingRedstone/Health-Copilot" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                            <tr><td>RGB LED panel driver</td><td class="mono">C</td><td>Driver and custom graphics library for a 3-bit RGB LED panel, with higher effective colour depth.</td><td><a href="https://github.com/RisingRedstone/RGB-Led-Panel" target="_blank" rel="noopener">Repo ↗</a></td></tr>
+                        </tbody>
+                    </table>
                 </div>
+                <p style="margin-top:20px"><a class="link-arrow" href="https://github.com/RisingRedstone" target="_blank" rel="noopener">All repositories on GitHub ↗</a></p>
             </div>
         </div>
     </section>
 
-    <!-- Research Interests Section -->
-    <section class="section">
+    <!-- Now -->
+    <section class="section" id="now">
         <div class="container">
-            <h2 class="section-title">Research Interests</h2>
-            <div class="research-grid">
-                <div class="research-item">
-                    <span class="research-icon">&#x1F9E0;</span>
-                    <h3>Multimodal AI Systems</h3>
-                    <p>Vision-language models, cross-modal reasoning, and safety-critical applications</p>
+            <div class="section-head">
+                <span class="section-no">§ 02</span>
+                <h2 class="section-title">Now</h2>
+                <p class="section-lede">What I'm working on as of October 2026.</p>
+            </div>
+            <div class="now-list">
+                <div class="now-row">
+                    <span class="status-badge status-private">Private</span>
+                    <div>
+                        <h3>Recursive-MAS MiniCPM</h3>
+                        <p>Replacing the FLA library dependency in the linear-attention layers with pure PyTorch, then fine-tuning for fewer thinking tokens.</p>
+                    </div>
                 </div>
-                <div class="research-item">
-                    <span class="research-icon">&#x26A1;</span>
-                    <h3>Efficient Neural Architectures</h3>
-                    <p>Model compression, pruning, KANs, and compute-efficient inference for edge deployment</p>
+                <div class="now-row">
+                    <span class="status-badge status-active">Active</span>
+                    <div>
+                        <h3><a href="blog-flexgemm.html">FlexGEMM CPU fallback</a></h3>
+                        <p>Writing a native CPU kernel for the submanifold neighbour map, then discussing with the maintainers how a CPU path should live in the library.</p>
+                    </div>
                 </div>
-                <div class="research-item">
-                    <span class="research-icon">&#x1F680;</span>
-                    <h3>GPU Computing & HPC</h3>
-                    <p>CUDA kernel programming, low-latency systems, and hardware-aware optimization</p>
+                <div class="now-row">
+                    <span class="status-badge status-private">Private</span>
+                    <div>
+                        <h3>CPDP phase 2</h3>
+                        <p>Comparing a segmented direct method against a Fourier-transform method (via Parseval's theorem) for pricing complex energy tariffs.</p>
+                    </div>
                 </div>
-                <div class="research-item">
-                    <span class="research-icon">&#x1F916;</span>
-                    <h3>Multi-Agent Systems</h3>
-                    <p>Cooperative RL, hierarchical agent orchestration, and local LLM coordination</p>
-                </div>
-                <div class="research-item">
-                    <span class="research-icon">&#x1F527;</span>
-                    <h3>Hardware/Software Co-Design</h3>
-                    <p>Security, performance, and the intersection of architecture and algorithms</p>
-                </div>
-                <div class="research-item">
-                    <span class="research-icon">&#x1F4CA;</span>
-                    <h3>Time-Series & Sequential Data</h3>
-                    <p>Pattern recognition through time, temporal reasoning, and sequential decision-making</p>
-                </div>
+            </div>
+            <div class="now-interests">
+                <span class="section-no">INTERESTS</span>
+                <ul>
+                    <li>Multimodal and vision-language models</li>
+                    <li>Efficient architectures and compression for edge deployment</li>
+                    <li>GPU computing, low-latency systems, and hardware/software co-design</li>
+                    <li>Multi-agent systems built from small local LLMs</li>
+                </ul>
             </div>
         </div>
     </section>
 
-    <!-- Skills Section -->
-    <section class="section section-alt" id="skills">
+    <!-- Experience -->
+    <section class="section" id="experience">
         <div class="container">
-            <h2 class="section-title">Skills & Technologies</h2>
-            <div class="skills-grid">
-                <div class="skill-category">
-                    <h3>AI & Machine Learning</h3>
-                    <div class="skill-items">
-                        <span>PyTorch</span>
-                        <span>TensorFlow</span>
-                        <span>Transformers</span>
-                        <span>CLIP / BERT</span>
-                        <span>CNNs / VAEs / GANs</span>
-                        <span>Reinforcement Learning</span>
-                        <span>KANs</span>
-                        <span>Multi-Agent RL</span>
-                        <span>Grad-CAM</span>
-                        <span>LLM Integration</span>
+            <div class="section-head">
+                <span class="section-no">§ 03</span>
+                <h2 class="section-title">Experience &amp; education</h2>
+            </div>
+            <div>
+                <div class="exp-row">
+                    <span class="exp-date">Expected 2028</span>
+                    <div>
+                        <h3>UNSW Sydney</h3>
+                        <p class="exp-role">Master of Information Technology, AI specialisation</p>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3>HPC & GPU</h3>
-                    <div class="skill-items">
-                        <span>CUDA</span>
-                        <span>Triton</span>
-                        <span>NVRTC</span>
-                        <span>Cache Optimization</span>
-                        <span>Lock-free Atomics</span>
-                        <span>Huge Pages</span>
-                        <span>Callgrind</span>
-                        <span>LTTng</span>
-                        <span>Core Pinning</span>
-                        <span>Branchless Code</span>
+                <div class="exp-row">
+                    <span class="exp-date">Jul – Sep 2025</span>
+                    <div>
+                        <h3>Nitesh Fashion Pvt Ltd</h3>
+                        <p class="exp-role">Software developer, full-stack</p>
+                        <ul>
+                            <li>Built an internal catalogue distribution platform: React Native app on a Rust (Axum) backend.</li>
+                            <li>Implemented per-customer negotiated wholesale pricing and WhatsApp-based catalogue delivery.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3>Languages</h3>
-                    <div class="skill-items">
-                        <span>C++23</span>
-                        <span>Python</span>
-                        <span>Rust</span>
-                        <span>C</span>
-                        <span>TypeScript</span>
-                        <span>JavaScript</span>
-                        <span>Go</span>
-                        <span>Swift</span>
-                        <span>SQL</span>
+                <div class="exp-row">
+                    <span class="exp-date">Jan – Jul 2025</span>
+                    <div>
+                        <h3>Commotion Software Solutions</h3>
+                        <p class="exp-role">Python developer, LLMs &amp; systems integration</p>
+                        <ul>
+                            <li>Built a framework that converts n8n workflows into a production platform covering 300+ third-party services.</li>
+                            <li>Combined a custom Python AST parser with LLM generation; prompt engineering and post-checks cut hallucinations by 28%.</li>
+                            <li>Wrote automated test scaffolding for edge cases in the generated integrations.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3>Systems & Backend</h3>
-                    <div class="skill-items">
-                        <span>C++20 Concepts</span>
-                        <span>RAII Patterns</span>
-                        <span>POSIX IPC</span>
-                        <span>mmap</span>
-                        <span>Axum (Rust)</span>
-                        <span>Node.js</span>
-                        <span>Flask</span>
-                        <span>PostgreSQL</span>
-                        <span>SQLite</span>
-                        <span>Docker</span>
+                <div class="exp-row">
+                    <span class="exp-date">Jan 2024 – Jan 2025</span>
+                    <div>
+                        <h3>Odyssey Lab Cohort</h3>
+                        <p class="exp-role">AI researcher, multimodal risk analysis</p>
+                        <ul>
+                            <li>Designed a vision-language scoring engine (CLIP image + BERT text embeddings) that rates risk in video, with Grad-CAM to check what the model attends to.</li>
+                            <li>Led 18 annotators in building a 100+ video safety dataset; used K-fold cross-validation and augmentation.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3>Frontend & Mobile</h3>
-                    <div class="skill-items">
-                        <span>React</span>
-                        <span>React Native</span>
-                        <span>Tailwind CSS</span>
-                        <span>HTMX</span>
-                        <span>HTML/CSS</span>
-                        <span>iOS (Swift)</span>
-                        <span>Firebase</span>
-                        <span>BLE</span>
+                <div class="exp-row">
+                    <span class="exp-date">Sep 2023 – May 2025</span>
+                    <div>
+                        <h3>Next Tech Lab</h3>
+                        <p class="exp-role">AI researcher, HPC &amp; neural architectures</p>
+                        <ul>
+                            <li>Researched Kolmogorov–Arnold Networks and spline-based architectures for compact function approximation.</li>
+                            <li>Prototyped VAEs, vision-language models (VQA, image–text retrieval) and uncertainty estimation; ran weekly paper seminars.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="skill-category">
-                    <h3>Cloud & DevOps</h3>
-                    <div class="skill-items">
-                        <span>AWS (EC2/S3)</span>
-                        <span>Docker</span>
-                        <span>Nix</span>
-                        <span>CMake</span>
-                        <span>Git</span>
-                        <span>CI/CD</span>
+                <div class="exp-row">
+                    <span class="exp-date">2021 – 2025</span>
+                    <div>
+                        <h3>SRM Institute of Science and Technology</h3>
+                        <p class="exp-role">B.Tech, Computer Science Engineering, with distinction</p>
+                    </div>
+                </div>
+                <div class="exp-row">
+                    <span class="exp-date">Jul – Sep 2021</span>
+                    <div>
+                        <h3>ANS IT India</h3>
+                        <p class="exp-role">iOS app developer</p>
+                        <ul><li>Built a Bluetooth LE item-tracking app with Firebase Auth and low-power scanning.</li></ul>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Publications Section -->
+    <!-- Publication & awards -->
     <section class="section" id="publications">
         <div class="container">
-            <h2 class="section-title">Publications & Achievements</h2>
-            <div class="pub-achieve-grid">
-                <div class="pub-section">
-                    <h3>Publication</h3>
-                    <div class="pub-card">
-                        <h4>ViDAS: Vision-based Danger Assessment and Scoring</h4>
-                        <p class="pub-venue">ICVGIP '24 — Proceedings of the 15th Indian Conference on Computer Vision, Graphics and Image Processing</p>
-                        <p class="pub-desc">Vision-language scoring engine using CLIP image embeddings + BERT text embeddings with Grad-CAM interpretability for safety-critical applications.</p>
-                        <a href="https://dl.acm.org/doi/10.1145/3702250.3702279" target="_blank" rel="noopener" class="pub-link">View Paper →</a>
-                    </div>
+            <div class="section-head">
+                <span class="section-no">§ 04</span>
+                <h2 class="section-title">Publication &amp; awards</h2>
+            </div>
+            <div class="pub">
+                <span class="section-no">PAPER</span>
+                <div>
+                    <h3>ViDAS: Vision-based Danger Assessment and Scoring</h3>
+                    <p>ICVGIP '24, the 15th Indian Conference on Computer Vision, Graphics and Image Processing. A CLIP + BERT scoring engine with Grad-CAM interpretability for safety-critical video.</p>
+                    <a class="link-arrow" href="https://dl.acm.org/doi/10.1145/3702250.3702279" target="_blank" rel="noopener">Read the paper ↗</a>
                 </div>
-                <div class="achieve-section">
-                    <h3>Achievements</h3>
-                    <div class="achieve-list">
-                        <div class="achieve-item">
-                            <span class="achieve-badge gold">1st</span>
-                            <div>
-                                <strong>DSHACKs 2024</strong>
-                                <p>LLM-powered medical diagnostic copilot</p>
-                            </div>
-                        </div>
-                        <div class="achieve-item">
-                            <span class="achieve-badge gold">1st</span>
-                            <div>
-                                <strong>ProjectExpo 2024</strong>
-                                <p>Offline rural health assistant using CV/NLP</p>
-                            </div>
-                        </div>
-                        <div class="achieve-item">
-                            <span class="achieve-badge bronze">3rd</span>
-                            <div>
-                                <strong>HackNova 2024</strong>
-                                <p>Chrome extension for toxicity detection</p>
-                            </div>
-                        </div>
-                        <div class="achieve-item">
-                            <span class="achieve-badge silver">2nd</span>
-                            <div>
-                                <strong>Quantathon 2023</strong>
-                                <p>Quantum sentiment analysis (Qiskit + NLP)</p>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <div class="awards">
+                <span class="section-no">AWARDS</span>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th scope="col">Result</th><th scope="col">Event</th><th scope="col">Project</th></tr></thead>
+                        <tbody>
+                            <tr><td class="mono">1st</td><td>DSHACKs 2024</td><td>LLM-powered medical diagnostic copilot</td></tr>
+                            <tr><td class="mono">1st</td><td>ProjectExpo 2024</td><td>Offline rural health assistant using CV and NLP</td></tr>
+                            <tr><td class="mono">3rd</td><td>HackNova 2024</td><td>Chrome extension for toxicity detection and rephrasing</td></tr>
+                            <tr><td class="mono">2nd</td><td>Quantathon 2023</td><td>Quantum sentiment analysis (Qiskit + NLP)</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section class="section section-alt" id="contact">
+    <!-- Skills -->
+    <section class="section" id="skills">
         <div class="container">
-            <h2 class="section-title">Get in Touch</h2>
-            <div class="contact-content">
-                <p class="contact-text">I'm always interested in research collaborations, challenging engineering problems, and opportunities at the intersection of AI and systems. Feel free to reach out.</p>
-                <div class="contact-links">
-                    <a href="mailto:prathamgohil751@gmail.com" class="contact-card">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.72a3 3 0 00-3-3h-15a3 3 0 00-3 3v.188l8.928 5.493a3 3 0 003.144 0l8.928-5.493z"/></svg>
-                        <span>prathamgohil751@gmail.com</span>
-                    </a>
-                    <a href="https://linkedin.com/in/pratham-gohil-110802173/" target="_blank" rel="noopener" class="contact-card">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                        <span>LinkedIn</span>
-                    </a>
-                    <a href="https://github.com/RisingRedstone" target="_blank" rel="noopener" class="contact-card">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                        <span>GitHub</span>
-                    </a>
-                </div>
+            <div class="section-head">
+                <span class="section-no">§ 05</span>
+                <h2 class="section-title">Toolbox</h2>
             </div>
+            <dl class="skill-lines">
+                <div class="skill-line"><dt>AI / ML</dt><dd>PyTorch, TensorFlow, PPO / MAPPO / A3C, CLIP, BERT, Grad-CAM, KANs, VAEs, quantised local LLMs (Qwen, Phi, Gemma)</dd></div>
+                <div class="skill-line"><dt>HPC &amp; GPU</dt><dd>CUDA, Triton, lock-free atomics, cache-line layout, huge pages, core pinning, callgrind, LTTng</dd></div>
+                <div class="skill-line"><dt>Languages</dt><dd>C++23, C, Python, Rust, Go, TypeScript, JavaScript</dd></div>
+                <div class="skill-line"><dt>Backend &amp; data</dt><dd>Rust (Axum), Node / Express, Flask, PostgreSQL, SQLite, async Python (httpx, aiosqlite)</dd></div>
+                <div class="skill-line"><dt>Frontend &amp; mobile</dt><dd>React, React Native (Expo), Tailwind CSS, HTMX, Bluetooth LE, Firebase Auth</dd></div>
+                <div class="skill-line"><dt>Tooling</dt><dd>Nix, CMake, Docker, AWS (EC2, S3), Git, Doxygen</dd></div>
+            </dl>
         </div>
     </section>
 
+    <!-- Contact -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="section-head">
+                <span class="section-no">§ 06</span>
+                <h2 class="section-title">Get in touch</h2>
+            </div>
+            <p class="contact-lede">I'm interested in research collaborations, hard engineering problems, and roles where AI and systems meet. Email is the fastest way to reach me.</p>
+            <div class="contact-links">
+                <a class="btn btn-primary" href="mailto:prathamgohil751@gmail.com">prathamgohil751@gmail.com</a>
+                <a class="btn btn-outline" href="https://github.com/RisingRedstone" target="_blank" rel="noopener">GitHub ↗</a>
+                <a class="btn btn-outline" href="https://linkedin.com/in/pratham-gohil-110802173/" target="_blank" rel="noopener">LinkedIn ↗</a>
+            </div>
+        </div>
+    </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+            <span>© 2026 Pratham Gohil</span>
+            <span>Hand-built with HTML, CSS &amp; JS · <a href="blog.html">Writing</a></span>
         </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="threadweaver-anim.js"></script>
 </body>
 </html>
