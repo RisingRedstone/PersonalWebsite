@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matching Engine Threadweaver — Writing | Pratham Gohil</title>
-    <meta name="description" content="The three lock-free buffer protocols behind a C++23 matching engine in progress, what each is for, and what is built so far.">
+    <title>Matching Engine (Threadweaver) — Writing | Pratham Gohil</title>
+    <meta name="description" content="A C++23 matching engine in progress, and Threadweaver, the lock-free messaging and shared-memory layer built first: cache-line layouts, three ring-buffer protocols, allocators and benchmarks.">
     <meta name="theme-color" content="#0d0c0a">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="blog-post.css">
@@ -39,26 +39,52 @@
                 <a href="blog.html" class="blog-back">← All writing</a>
 
                 <header class="post-header">
-                    <span class="status-badge status-active">Active</span>
-                    <h1>Matching Engine Threadweaver</h1>
-                    <p class="post-subtitle">Three ring-buffer protocols for a low-latency matching engine, and an honest status report</p>
+                    <span class="status-badge status-active">Active · engine in progress</span>
+                    <h1>Matching Engine (Threadweaver)</h1>
+                    <p class="post-subtitle">A low-latency matching engine in C++23, and Threadweaver, the lock-free messaging layer I built first</p>
                     <div class="post-meta">
-                        <span class="reading-time">8 min read · Oct 2026</span>
+                        <span class="reading-time">11 min read · Oct 2026</span>
                         <a href="https://github.com/RisingRedstone/Matching-Engine-Threadweaver" target="_blank" rel="noopener" class="github-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> Source on GitHub</a>
                     </div>
-                    <div class="tech-tags"><span>C++23</span><span>lock-free</span><span>MPSC</span><span>cmov</span><span>Nix</span><span>callgrind</span></div>
+                    <div class="tech-tags"><span>C++23</span><span>lock-free</span><span>atomics</span><span>MPSC</span><span>huge pages</span><span>cmov</span><span>callgrind</span><span>LTTng</span></div>
                 </header>
 
                 <div class="post-content">
 
                     <section id="status">
                         <h2>Where it stands</h2>
-                        <p>The goal is a matching engine for high-frequency workloads, in C++23, built hardware-first. So far I have built and benchmarked the layer underneath it: the messaging between processes and the shared-memory allocators, plus an early skip list. The matching logic itself is not written yet.</p>
-                        <div class="callout"><p data-label="Status">The 1.25B and 650M ops/sec figures in this post measure the ring buffers. They are the foundation of the engine, not an end-to-end order-matching rate.</p></div>
+                        <p>The goal is a matching engine for high-frequency workloads, in C++23, built hardware-first. I am building it bottom-up, and <strong>Threadweaver</strong> is the name of the first layer: the messaging between processes, the shared-memory allocators under it, and the cache-line-aware containers both are made of. It lives in the same repository as the engine.</p>
+                        <div class="benchmark-table">
+                            <table>
+                                <thead><tr><th scope="col">Layer</th><th scope="col">State</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Ring buffers (simple, three-pointer, cell-lockable)</td><td>Built and benchmarked</td></tr>
+                                    <tr><td>Shared-memory allocators</td><td>Built and tested</td></tr>
+                                    <tr><td>Order book (skip list)</td><td>Interface sketch only</td></tr>
+                                    <tr><td>Matching logic</td><td>Not started</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout"><p data-label="Status">The 1.25B and 400M ops/sec figures below measure the ring buffers. They are the foundation of the engine, not an end-to-end order-matching rate.</p></div>
                     </section>
 
-                    <section id="protocols">
-                        <h2>Three protocols</h2>
+
+                    <section id="problem">
+                        <h2>The problem</h2>
+                        <p>Moving a value from one core to another is not limited by arithmetic. It is limited by the cache-coherence protocol: every time two cores touch the same cache line, that line has to travel between them. A queue between two processes is a good test of that, because the only work is handing data over.</p>
+                        <p>Threadweaver is my attempt to see how close a queue can get to that hardware limit, because an engine that matches orders across processes spends much of its time handing data over.</p>
+                    </section>
+
+
+                    <section id="design">
+                        <h2>Design</h2>
+
+                        <h3 id="layout">Layout: one cache line per hot value</h3>
+                        <p>The first rule is that independently written values never share a 64-byte cache line. In the ring buffer layout, <code>write_head</code> and <code>read_head</code> are each <code>alignas(64)</code>, so the producer writing one head does not invalidate the line the consumer is reading the other from. Data containers follow the same rule: <code>CacheLineSlot&lt;D, Header&gt;</code> is checked with <code>static_assert</code> to be exactly 64 bytes, and <code>CacheLinePacked</code> is a union that exposes the same line as raw <code>uint64_t[]</code> for copying or as a typed slot for use.</p>
+                        <p>The second rule is that capacity is a power of two, so the slot for a head is <code>head &amp; (size - 1)</code> and not a division. Heads only ever grow, which also removes the need to distinguish "full" from "empty" with a spare slot: the buffer is full when <code>w_h &gt;= size + r_h</code>.</p>
+                        <div class="callout"><p data-label="Decision">Each side caches its own head and only loads the other side's head. The one cross-core load per call is the cost of knowing whether the buffer is full or empty. Everything else stays in the core's own cache.</p></div>
+
+                        <h3 id="protocols">Three protocols for different traffic</h3>
                         <p>One engine needs different queues for different traffic. A single producer feeding a single consumer should pay almost nothing. Many producers feeding one consumer must not serialise on one shared counter. I built a protocol for each.</p>
                         <div class="benchmark-table">
                             <table>
@@ -70,52 +96,99 @@
                                 </tbody>
                             </table>
                         </div>
+<h3 id="simple">Simple: one producer, one consumer</h3>
+                        <p>Each side keeps a cached copy of its own head and loads the other's with acquire semantics. There is also a branchless variant that uses inline x86 <code>cmov</code> to pick pointers, so a rarely-taken condition does not cost a pipeline flush. This is the design behind the 1.25B ops/sec figure. The producer and the consumer are separate <code>fork()</code>ed processes pinned to CPUs 3 and 2, which are the two hardware threads of one physical core, so they share an L1 cache. They use one <code>mmap</code>'d layout.</p>
+                        <figure class="tw tw-full" data-tw-anim="full">
+                            <div class="tw-bar"><span>SIMPLE SCSP RING BUFFER · 2 PROCESSES</span><span class="tw-scene" aria-hidden="true"></span></div>
+                            <div class="tw-stage">
+                                <p class="tw-fallback">A producer process on core 3 and a consumer process on core 2 pass data through a lock-free ring buffer in shared memory. Enable JavaScript to see it animated.</p>
+                            </div>
+                            <figcaption class="tw-caption">Model of <code>simple_approach.hpp</code>. 8 slots shown; the benchmark's default build uses 2<sup>23</sup>. Slowed down billions of times, so it is not a benchmark. Try <em>Producer faster</em> to fill the buffer, or press Step to walk through one load, check, copy or store at a time.</figcaption>
+                        </figure>
+                        <ul>
+                            <li><strong>Full:</strong> when <code>w_h_cache &gt;= size + r_h</code>, <code>write()</code> returns <code>false</code> and the caller retries. In the benchmark the retry loop only issues <code>pause</code> after 100 failed attempts.</li>
+                            <li><strong>Empty:</strong> when <code>r_h_cache &gt;= w_h</code>, <code>read()</code> returns <code>nullopt</code> and the consumer retries the same way.</li>
+                            <li><strong>Wrap-around:</strong> because the slot is <code>head &amp; (size - 1)</code>, any size that is not a power of two would silently break indexing, which is why the <code>PowerOfTwo</code> concept rejects it at compile time.</li>
+                        </ul>
 
-                        <h3 id="simple">Simple</h3>
-                        <p>Each side keeps a cached copy of its own head and loads the other's with acquire semantics. A write fails when <code>w_h &gt;= size + r_h</code>. There is also a branchless variant that uses inline x86 <code>cmov</code> to pick pointers, so a rarely-taken condition does not cost a pipeline flush. The <a href="blog-threadweaver.html#simple-buffer">Threadweaver post</a> walks through this one with an animation.</p>
-
+                        
                         <h3 id="three-pointer">Three-pointer</h3>
                         <p>Producers claim a slot by CAS on <code>write_head</code>, write their data, then publish by CAS on <code>commit_head</code>. The consumer only reads <code>commit_head</code>. Keeping those two on separate cache lines means a producer's claim does not disturb the line the consumer polls. Producers still wait for each other at <code>commit_head</code>, and that is the bottleneck the next protocol removes.</p>
 
                         <h3 id="cell-lockable">Cell-lockable</h3>
                         <p>There is no <code>commit_head</code>. A producer takes a slot with <code>fetch_add</code> on <code>write_head</code>, then spin-locks that one cell before writing. The lock is a single bit in a one-byte header, set with an inline <code>lock bts</code>, and an RAII guard releases it. Contention is spread over as many cells as the buffer has. The optimised variant uses <code>_mm_pause()</code> while spinning, caches the write head, and uses relaxed increments.</p>
+
+                        <h3 id="memory">Shared memory without copies</h3>
+                        <p>Buffers live in memory mapped with <code>mmap(MAP_SHARED | MAP_ANON | MAP_HUGE_2MB)</code> before the <code>fork()</code>, so every child sees the same pages. Huge pages cut down the number of TLB entries a large buffer needs, which matters once the buffer is bigger than the TLB can cover with 4&nbsp;KB pages.</p>
+                        <p>Two allocators sit on top. <code>OneTimeStaticSharedMemoryAllocator</code> is reference-counted and records the owner PID, so a forked child cannot unmap memory its parent still uses. <code>DistributedDynamicParentAllocator</code> manages named segments through <code>shm_open</code>/<code>shm_unlink</code> in a 100-entry table, and can grow a segment with <code>mremap(MREMAP_MAYMOVE)</code>.</p>
                     </section>
 
-                    <section id="numbers">
-                        <h2>Benchmarks</h2>
+
+                    <section id="contracts">
+                        <h2>Compile-time contracts</h2>
+                        <p>Most of the dangerous mistakes in this code (wrong size, wrong index type, a lock guard used with the wrong layout) are silent at runtime, so I moved them into C++20 concepts that fail the build instead.</p>
+                        <details>
+                            <summary>Concepts used</summary>
+                            <ul>
+                                <li><code>PowerOfTwo&lt;N&gt;</code> enforces power-of-two capacity for mask indexing.</li>
+                                <li><code>IsStandardUint&lt;T&gt;</code> limits index types to <code>uint8_t</code> through <code>uint64_t</code>.</li>
+                                <li><code>LockableCell&lt;T&gt;</code> requires <code>try_lock</code>, <code>unlock</code>, <code>clear_data</code> and <code>contains_data</code>.</li>
+                                <li><code>ReadLockableIndex&lt;Layout&gt;</code> and <code>WriteLockableIndex&lt;Layout&gt;</code> check that a layout's guard types are movable but not copyable.</li>
+                                <li><code>LayoutVerification&lt;T&gt;</code> checks that a layout exposes <code>MemLayout</code>, <code>data_type</code>, <code>index_type</code>, atomic heads and <code>operator[]</code>.</li>
+                            </ul>
+                        </details>
+                        <details>
+                            <summary>RAII guard hierarchy</summary>
+                            <ol>
+                                <li><code>SingleResourceLockGuard</code>: stateless unlock functor.</li>
+                                <li><code>InstSingleResourceLockGuard</code>: stores the unlock object, for unlock logic that needs context.</li>
+                                <li><code>InstSingleResourceLockGuardWrapper</code>: chains several unlock behaviours.</li>
+                                <li><code>TemplateLockedLockGuard</code>: type-state locking, where locking turns a <code>T&lt;false&gt;</code> into a <code>T&lt;true&gt;</code>.</li>
+                            </ol>
+                        </details>
+                    </section>
+
+
+                    <section id="results">
+                        <h2>Measurements</h2>
                         <div class="benchmark-table">
                             <table>
-                                <thead><tr><th scope="col">Configuration</th><th scope="col">Throughput</th></tr></thead>
+                                <thead><tr><th scope="col">Configuration</th><th scope="col">Throughput</th><th scope="col">Setup</th></tr></thead>
                                 <tbody>
-                                    <tr><td>1 producer, 1 consumer</td><td><strong>1.25B ops/sec</strong></td></tr>
-                                    <tr><td>8 producers, 1 consumer</td><td><strong>650M ops/sec</strong></td></tr>
+                                    <tr><td>1 producer, 1 consumer (SCSP), simple buffer</td><td><strong>1.25B ops/sec</strong></td><td>Two processes pinned to the two hardware threads of one physical core (sharing L1)</td></tr>
+                                    <tr><td>8 producers, 1 consumer (SCMP)</td><td><strong>400M ops/sec</strong></td><td>Multi-producer protocol under write contention</td></tr>
                                 </tbody>
                             </table>
                         </div>
-                        <p>In the benchmark processes the producer and consumer are pinned to separate cores, and the harness counts cycles with <code>rdtscp</code>. Profiling used callgrind with cache simulation and instruction dumps, viewed in kcachegrind.</p>
+                        <p>The 1.25B figure depends on that topology: with the producer and consumer on one core's L1, the head the other side polls never has to cross cores. Both numbers come from the repository's benchmark harness, which forks the reader and the writers, pins them, and times the transfer with <code>rdtscp</code>. Per-function instruction counts came from <strong>callgrind</strong> and call-graph inspection in <strong>kcachegrind</strong>; execution tracing used <strong>LTTng-UST</strong> with <strong>URCU</strong> for safe reclamation.</p>
+                        <div class="callout"><p data-label="Read with care">These are microbenchmarks of the queue itself, in one environment. They say how fast data can move through the buffer, not how fast an application built on top will run.</p></div>
                     </section>
 
-                    <section id="decisions">
-                        <h2>Design decisions</h2>
-                        <ol>
-                            <li><strong>Cell-lockable for scaling.</strong> Serialising producers on one commit counter does not survive heavy contention, so the lock moves into the cells. At 8×8 threads this was about 3× faster than the naive baselines.</li>
-                            <li><strong>64-byte granularity everywhere.</strong> Heads are a full line apart, and containers are packed to exactly one line, checked with <code>static_assert</code>.</li>
-                            <li><strong>No mutexes.</strong> Every synchronisation point is an atomic: <code>compare_exchange_weak</code>, <code>fetch_add</code>, or a test-and-set on a lock bit.</li>
-                            <li><strong>Mistakes fail the build.</strong> Capacity, index types and guard types are checked by concepts, so a wrong combination does not compile.</li>
-                            <li><strong>Huge pages.</strong> Buffers are mapped with 2&nbsp;MB pages to keep the TLB from becoming the limit at large sizes.</li>
-                        </ol>
+
+                    <section id="lessons">
+                        <h2>What went wrong and what I would change</h2>
+                        <ul>
+                            <li><strong>My first memory orderings were wrong.</strong> An early commit message of mine says I had used whatever order compiled. I went back through every load and store and chose each one on purpose. In the cell-lockable design the cell's own lock already gives the acquire and release, so the head accesses there can be relaxed.</li>
+                            <li><strong>Several bugs lived in the type system, not the algorithm.</strong> An unlock type in the guard hierarchy was declared against the wrong name. That is the kind of mistake the concepts now catch at compile time.</li>
+                            <li><strong>Contention moves, it does not vanish.</strong> The three-pointer protocol serialises producers on <code>commit_head</code>. The cell-lockable protocol spreads that over the cells, and in my 8-thread contention test it came out about 3× faster than the naive baselines.</li>
+                            <li><strong>What I would do next:</strong> record the full benchmark environment alongside every number, and measure the same buffers with the two processes on different physical cores, to see how much of 1.25B is topology.</li>
+                        </ul>
+                    </section>
+                    <section id="next">
+                        <h2>What comes next</h2>
+                        <p>The order book is next: a skip list whose nodes carry aggregates (order counts, price maxima) so the hot path can defer inserts and deletes. After that comes the matching logic itself, fed by these buffers.</p>
                     </section>
 
                     <section class="related-projects">
                         <h2>Related</h2>
-                        <div class="related-grid"><a href="blog-threadweaver.html" class="related-card"><strong>Threadweaver</strong><p>Layouts, shared memory and an animated model of the simple buffer.</p></a><a href="blog-cleaning-robot.html" class="related-card"><strong>Multi-Agent Cleaning Robot</strong><p>A very different project, from the AI side.</p></a></div>
+                        <div class="related-grid"><a href="blog-flexgemm.html" class="related-card"><strong>FlexGEMM CPU fallback</strong><p>Cache-line-padded bucket locks, reused for a CPU sparse-convolution backend.</p></a><a href="blog-cleaning-robot.html" class="related-card"><strong>Multi-Agent Cleaning Robot</strong><p>A very different project, from the AI side.</p></a></div>
                     </section>
                 </div>
             </div>
 
             <aside class="post-toc" aria-label="On this page">
                 <h2 class="toc-title">On this page</h2>
-                <ul class="toc-list"><li><a href="#status">Where it stands</a></li><li><a href="#protocols">Three protocols</a><ul class="toc-list"><li class="toc-h3"><a href="#simple">Simple</a></li><li class="toc-h3"><a href="#three-pointer">Three-pointer</a></li><li class="toc-h3"><a href="#cell-lockable">Cell-lockable</a></li></ul></li><li><a href="#numbers">Benchmarks</a></li><li><a href="#decisions">Design decisions</a></li></ul>
+                <ul class="toc-list"><li><a href="#status">Where it stands</a></li><li><a href="#problem">The problem</a></li><li><a href="#design">Design</a><ul class="toc-list"><li class="toc-h3"><a href="#layout">Layout: one cache line per hot value</a></li><li class="toc-h3"><a href="#protocols">Three protocols</a></li><li class="toc-h3"><a href="#simple">Simple</a></li><li class="toc-h3"><a href="#three-pointer">Three-pointer</a></li><li class="toc-h3"><a href="#cell-lockable">Cell-lockable</a></li><li class="toc-h3"><a href="#memory">Shared memory without copies</a></li></ul></li><li><a href="#contracts">Compile-time contracts</a></li><li><a href="#results">Measurements</a></li><li><a href="#lessons">What went wrong</a></li><li><a href="#next">What comes next</a></li></ul>
             </aside>
         </div>
     </article>
@@ -129,5 +202,6 @@
 
     <script src="script.js"></script>
     <script src="post.js"></script>
+    <script src="threadweaver-anim.js"></script>
 </body>
 </html>

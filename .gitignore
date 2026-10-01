@@ -1,3 +1,22 @@
 report.txt
 hermes.json
 .hermes/
+
+# Agent and planning files (not part of the site)
+AGENTS.md
+SOUL.md
+plan.md
+matching-engine-summary.md
+.claude/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Dependencies and build output
+node_modules/
+dist/

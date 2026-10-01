@@ -59,10 +59,8 @@
             </figure>
         </div>
         <div class="hero-metrics" aria-label="Selected metrics">
-            <div><strong>1.25B</strong><span>ops/sec · single producer, single consumer</span></div>
-            <div><strong>650M</strong><span>ops/sec · 8 producers, 1 consumer</span></div>
-            <div><strong>19</strong><span>public GitHub repositories</span></div>
             <div><strong>1</strong><span>peer-reviewed paper · ICVGIP '24</span></div>
+            <div><strong>19</strong><span>public GitHub repositories</span></div>
         </div>
     </section>
 
@@ -95,30 +93,29 @@
             <article class="work-item">
                 <span class="work-no">01 / SYSTEMS</span>
                 <div class="work-body">
-                    <span class="status-badge">Complete · engine in progress</span>
-                    <h3><a href="blog-threadweaver.html">Threadweaver: messaging for a matching engine</a></h3>
-                    <p>Moving data between threads is limited by cache coherence, not arithmetic. Threadweaver is a family of lock-free ring buffers in C++23, with every head on its own 64-byte cache line, power-of-two mask indexing, and 2&nbsp;MB huge-page shared memory.</p>
-                    <p>It is the foundation of a matching engine I am building: the buffers and allocators are done and benchmarked at 1.25B ops/sec with one producer and 650M ops/sec with eight, without a single mutex. The matching logic on top is next.</p>
+                    <span class="status-badge status-active">Active · engine in progress</span>
+                    <h3><a href="blog-matching-engine.html">Matching Engine (Threadweaver)</a></h3>
+                    <p>Moving data between threads is limited by cache coherence, not arithmetic. I am building a low-latency matching engine from the bottom up, and its first layer, Threadweaver, is a family of lock-free ring buffers in C++23, with every head on its own 64-byte cache line, power-of-two mask indexing, and 2&nbsp;MB huge-page shared memory.</p>
+                    <p>The buffers and allocators are done and benchmarked at 1.25B ops/sec with one producer and consumer on one core's L1, and 400M ops/sec with eight producers, without a single mutex. The order book and matching logic on top are next.</p>
                     <div class="tags"><span>C++23</span><span>lock-free</span><span>atomics</span><span>huge pages</span><span>callgrind</span></div>
                     <div class="work-links">
-                        <a class="link-arrow" href="blog-threadweaver.html">Technical write-up →</a>
-                        <a class="link-arrow" href="blog-matching-engine.html">Engine status →</a>
+                        <a class="link-arrow" href="blog-matching-engine.html">Technical write-up →</a>
                         <a class="link-arrow" href="https://github.com/RisingRedstone/Matching-Engine-Threadweaver" target="_blank" rel="noopener">Source ↗</a>
                     </div>
                 </div>
                 <figure class="work-visual">
                     <svg viewBox="0 0 420 170" role="img" aria-labelledby="bench-t bench-d">
                         <title id="bench-t">Ring buffer throughput by configuration</title>
-                        <desc id="bench-d">Bar chart. Single producer, single consumer: 1.25 billion operations per second. Eight producers, one consumer: 650 million operations per second.</desc>
+                        <desc id="bench-d">Bar chart. Single producer, single consumer: 1.25 billion operations per second. Eight producers, one consumer: 400 million operations per second.</desc>
                         <text class="v-dim" x="0" y="14">PEAK THROUGHPUT, OPS/SEC</text>
                         <text class="v-txt" x="0" y="48">1P · 1C (SCSP)</text>
                         <rect class="v-bar" x="0" y="56" width="400" height="22"/>
                         <text class="v-num" x="404" y="48" text-anchor="end">1.25B</text>
                         <text class="v-txt" x="0" y="112">8P · 1C</text>
-                        <rect class="v-bar-2" x="0" y="120" width="208" height="22"/>
-                        <text class="v-num" x="212" y="112" text-anchor="start" style="fill:var(--text)">650M</text>
+                        <rect class="v-bar-2" x="0" y="120" width="128" height="22"/>
+                        <text class="v-num" x="128" y="112" text-anchor="start" style="fill:var(--text)">400M</text>
                     </svg>
-                    <figcaption>Ring-buffer throughput by configuration. SCSP = single producer, single consumer.</figcaption>
+                    <figcaption>Ring-buffer throughput by configuration. SCSP = single producer, single consumer, on one core's L1.</figcaption>
                 </figure>
             </article>
 
