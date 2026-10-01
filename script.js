@@ -1,28 +1,30 @@
 // ===== Navigation =====
-const navbar = document.getElementById('navbar');
+const navbar = document.getElementById('navbar') || document.querySelector('.navbar');
 const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
 
 // Scroll effect for navbar
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
+    if (navbar && window.scrollY > 50) {
         navbar.classList.add('scrolled');
-    } else {
+    } else if (navbar) {
         navbar.classList.remove('scrolled');
     }
 });
 
 // Mobile menu toggle
-navToggle.addEventListener('click', () => {
+navToggle?.addEventListener('click', () => {
     navToggle.classList.toggle('active');
     navLinks.classList.toggle('active');
+    navToggle.setAttribute('aria-expanded', navLinks.classList.contains('active'));
 });
 
 // Close mobile menu on link click
-navLinks.querySelectorAll('a').forEach(link => {
+navLinks?.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
         navToggle.classList.remove('active');
         navLinks.classList.remove('active');
+        navToggle.setAttribute('aria-expanded', 'false');
     });
 });
 
@@ -66,129 +68,7 @@ function typeEffect() {
 }
 
 // Start typing effect after page loads
-setTimeout(typeEffect, 1500);
-
-// ===== Hero Canvas Animation =====
-const canvas = document.getElementById('heroCanvas');
-const ctx = canvas.getContext('2d');
-
-let particles = [];
-let mouse = { x: null, y: null };
-let animationFrame;
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-resizeCanvas();
-window.addEventListener('resize', () => {
-    resizeCanvas();
-    initParticles();
-});
-
-// Track mouse position
-window.addEventListener('mousemove', (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
-});
-
-class Particle {
-    constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 - 0.5;
-        this.opacity = Math.random() * 0.5 + 0.2;
-    }
-    
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        
-        // Wrap around edges
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-        
-        // Mouse interaction
-        if (mouse.x !== null && mouse.y !== null) {
-            const dx = mouse.x - this.x;
-            const dy = mouse.y - this.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < 150) {
-                const force = (150 - distance) / 150;
-                this.x -= dx * force * 0.02;
-                this.y -= dy * force * 0.02;
-            }
-        }
-    }
-    
-    draw() {
-        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-function initParticles() {
-    particles = [];
-    const particleCount = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000));
-    
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
-}
-
-function connectParticles() {
-    const maxDistance = 120;
-    
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < maxDistance) {
-                const opacity = (1 - distance / maxDistance) * 0.15;
-                ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-    });
-    
-    connectParticles();
-    animationFrame = requestAnimationFrame(animateParticles);
-}
-
-initParticles();
-animateParticles();
-
-// Pause animation when tab is not visible
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        cancelAnimationFrame(animationFrame);
-    } else {
-        animateParticles();
-    }
-});
+if (taglineElement) setTimeout(typeEffect, 1500);
 
 // ===== Scroll Reveal Animation =====
 const revealElements = document.querySelectorAll(
@@ -254,11 +134,7 @@ window.addEventListener('scroll', highlightNavOnScroll);
 // ===== Performance: Reduce animations on low-end devices =====
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-if (prefersReducedMotion.matches) {
-    cancelAnimationFrame(animationFrame);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Disable typing effect
+if (prefersReducedMotion.matches && taglineElement) {
     taglineElement.textContent = taglines[0];
 }
 

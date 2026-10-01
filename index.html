@@ -12,11 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#hero" class="nav-logo">PG</a>
-            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
@@ -33,33 +34,51 @@
     </nav>
 
     <!-- Hero Section -->
+    <main id="main-content">
     <section class="hero" id="hero">
-        <div class="hero-bg">
-            <canvas id="heroCanvas"></canvas>
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-grid container">
+            <div class="hero-content">
+                <p class="hero-eyebrow"><span></span> AI / SYSTEMS / RESEARCH</p>
+                <p class="hero-greeting">Hello, I'm</p>
+                <h1 class="hero-name">Pratham<br><em>Gohil</em></h1>
+                <p class="hero-positioning">I build efficient intelligent systems — from lock-free C++ infrastructure to multimodal and multi-agent AI.</p>
+                <p class="hero-subtitle">Master of IT (AI) at UNSW Sydney, working across AI research, high-performance computing, and low-level systems engineering.</p>
+                <div class="hero-cta">
+                    <a href="#projects" class="btn btn-primary">View Projects <span aria-hidden="true">↗</span></a>
+                    <a href="#contact" class="btn btn-outline">Get in Touch</a>
+                </div>
+                <div class="hero-links">
+                    <a href="https://github.com/RisingRedstone" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+                    <a href="https://linkedin.com/in/pratham-gohil-110802173/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.792 0 22.222 0h.003z"/></svg></a>
+                    <a href="mailto:prathamgohil751@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.72a3 3 0 00-3-3h-15a3 3 0 00-3 3v.188l8.928 5.493a3 3 0 003.144 0l8.928-5.493z"/></svg></a>
+                </div>
+            </div>
+            <div class="hero-system" aria-label="Abstract systems architecture diagram">
+                <div class="system-label system-label-top"><span class="status-dot"></span> LIVE SYSTEMS VIEW</div>
+                <svg class="system-diagram threadweaver-demo" viewBox="0 0 560 560" role="img" aria-label="A producer process on core 3 writes data to a shared lock-free ring buffer, and a consumer process on core 2 reads from it">
+                    <defs>
+                        <pattern id="heroGrid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0 L0 0 0 32" fill="none" stroke="currentColor" stroke-width="1" opacity=".16"/></pattern>
+                        <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="currentColor"/></marker>
+                    </defs>
+                    <rect width="560" height="540" fill="url(#heroGrid)"/>
+                    <text class="diagram-caption" x="34" y="42">PROCESS A</text><text class="diagram-caption" x="34" y="57">PRODUCER / CORE 3</text>
+                    <text class="diagram-caption" x="414" y="42">PROCESS B</text><text class="diagram-caption" x="414" y="57">CONSUMER / CORE 2</text>
+                    <g class="core-box" transform="translate(28 78)"><rect width="118" height="82" rx="3"/><text class="diagram-core-title" x="14" y="24">CORE 3</text><text class="diagram-micro" x="14" y="46">producer.write()</text><text class="diagram-micro" x="14" y="63">local w_h_cache</text></g>
+                    <g class="core-box" transform="translate(414 78)"><rect width="118" height="82" rx="3"/><text class="diagram-core-title" x="14" y="24">CORE 2</text><text class="diagram-micro" x="14" y="46">consumer.read()</text><text class="diagram-micro" x="14" y="63">local r_h_cache</text></g>
+                    <path class="diagram-line diagram-line-accent" d="M87 160 V190" stroke-width="2" marker-end="url(#arrowHead)"/><text class="diagram-caption flow-caption" x="98" y="178">WRITE DATA</text>
+                    <g class="shared-memory" transform="translate(82 190)"><rect class="diagram-panel" width="396" height="146" rx="4"/><text class="diagram-caption" x="20" y="26">SHARED MEMORY · CACHE-LINE ALIGNED</text><text class="diagram-micro" x="20" y="43">one shared mapping · data slots are written before publication</text><g class="buffer-cells" transform="translate(20 64)"><rect width="54" height="42"/><rect x="60" width="54" height="42"/><rect class="buffer-cell-active" x="120" width="54" height="42"/><rect x="180" width="54" height="42"/><rect x="240" width="54" height="42"/><rect x="300" width="56" height="42"/><text x="27" y="26" text-anchor="middle">r+0</text><text x="87" y="26" text-anchor="middle">r+1</text><text x="147" y="26" text-anchor="middle">w</text><text x="207" y="26" text-anchor="middle">w+1</text><text x="267" y="26" text-anchor="middle">…</text><text x="328" y="26" text-anchor="middle">free</text></g><text class="diagram-micro" x="20" y="128">data[w] = item  →  publish index  →  item = data[r]</text></g>
+                    <path class="diagram-line diagram-line-accent" d="M473 336 V160" stroke-width="2" marker-end="url(#arrowHead)"/><text class="diagram-caption flow-caption" x="378" y="178">READ DATA</text>
+                    <circle id="writePacket" class="packet packet-write" cx="87" cy="174" r="5"/><circle id="readPacket" class="packet packet-read" cx="473" cy="350" r="5"/>
+                </svg>
+                <div class="system-label system-label-bottom">THREADWEAVER / 01 <span>STATUS: ONLINE</span></div>
+            </div>
         </div>
-        <div class="hero-content">
-            <p class="hero-greeting">Hello, I'm</p>
-            <h1 class="hero-name">Pratham Gohil</h1>
-            <div class="hero-tagline">
-                <span class="tagline-line" id="taglineLine"></span>
-                <span class="cursor">|</span>
-            </div>
-            <p class="hero-subtitle">Master of IT (AI) at UNSW Sydney — building at the intersection of AI research and high-performance systems.</p>
-            <div class="hero-cta">
-                <a href="#projects" class="btn btn-primary">View Projects</a>
-                <a href="#contact" class="btn btn-outline">Get in Touch</a>
-            </div>
-            <div class="hero-links">
-                <a href="https://github.com/RisingRedstone" target="_blank" rel="noopener" aria-label="GitHub">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                </a>
-                <a href="https://linkedin.com/in/pratham-gohil-110802173/" target="_blank" rel="noopener" aria-label="LinkedIn">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                </a>
-                <a href="mailto:prathamgohil751@gmail.com" aria-label="Email">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.72a3 3 0 00-3-3h-15a3 3 0 00-3 3v.188l8.928 5.493a3 3 0 003.144 0l8.928-5.493z"/></svg>
-                </a>
-            </div>
+        <div class="hero-metrics" aria-label="Selected metrics">
+            <div><strong>1.25B</strong><span>ops/sec · SCSP</span></div>
+            <div><strong>650M</strong><span>ops/sec · matching engine</span></div>
+            <div><strong>18</strong><span>public repositories</span></div>
+            <div><strong>1</strong><span>peer-reviewed publication</span></div>
         </div>
         <div class="scroll-indicator">
             <span></span>
@@ -74,7 +93,7 @@
                 <div class="about-text">
                     <p>I'm a <strong>Master of IT (AI Specialization)</strong> student at UNSW Sydney with a deep passion for building systems that push the boundaries of what's possible — from billion-ops-per-second concurrent data structures to multi-agent reinforcement learning environments.</p>
                     <p>My work spans the full spectrum: I write CUDA kernels for GPU-accelerated rendering, design lock-free concurrency primitives in C++23, implement neural networks from scratch in PyTorch, and architect production-grade async data pipelines. I believe the most interesting engineering happens at the intersection of AI and systems.</p>
-                    <p>Previously, I completed my B.Tech in Computer Science at SRM Institute (CGPA 8.88/10), where I published research on vision-based danger assessment at ICVGIP '24 and won multiple hackathons. I've built everything from matching engines benchmarked at 650M ops/sec to edge-optimized recursive-thinking LLMs.</p>
+                    <p>Previously, I completed my B.Tech in Computer Science at SRM Institute, where I published research on vision-based danger assessment at ICVGIP '24 and won multiple hackathons. I've built everything from matching engines benchmarked at 650M ops/sec to edge-optimized recursive-thinking LLMs.</p>
                 </div>
                 <div class="about-stats">
                     <div class="stat-card">
@@ -176,31 +195,35 @@
             <div class="projects-grid">
                 <div class="project-card featured">
                     <div class="project-card-header">
-                        <span class="project-icon">&#x26A1;</span>
+                        <span class="project-icon project-icon-systems" aria-hidden="true">↔</span>
                         <h3><a href="blog-threadweaver.html">Threadweaver Core</a></h3>
                     </div>
+                    <div class="project-meta"><span class="project-status">Complete</span><span>Systems · 2025</span></div>
                     <p class="project-desc">Ultra-high-throughput concurrency primitives achieving peak SCSP throughput of 1.25B ops/sec. Features cache-saturating ring buffers, lock-free MPSC protocols, 2MB Huge Pages, and compile-time safety via C++20 concepts.</p>
                     <div class="tech-tags">
                         <span>C++23</span><span>Lock-free</span><span>Atomics</span><span>Huge Pages</span>
                     </div>
+                    <div class="project-actions"><a href="blog-threadweaver.html">Technical write-up →</a><a href="https://github.com/RisingRedstone" target="_blank" rel="noopener">GitHub ↗</a></div>
                 </div>
 
                 <div class="project-card featured">
                     <div class="project-card-header">
-                        <span class="project-icon">&#x1F4CA;</span>
+                        <span class="project-icon project-icon-systems" aria-hidden="true">▦</span>
                         <h3><a href="blog-threadweaver.html">Matching Engine</a></h3>
                     </div>
                     <p class="project-desc">Ultra-low latency matching engine benchmarked at 650M ops/sec (8 producers × 1 consumer). Zero-mutex design using hardware-first primitives — inline <code>cmov</code>, atomic <code>lock bts</code>, cache-line-aligned containers.</p>
                     <div class="tech-tags">
                         <span>C++23</span><span>HPC</span><span>Callgrind</span><span>Branchless</span>
                     </div>
+                    <div class="project-actions"><a href="blog-threadweaver.html">Technical write-up →</a><a href="https://github.com/RisingRedstone" target="_blank" rel="noopener">GitHub ↗</a></div>
                 </div>
 
                 <div class="project-card">
                     <div class="project-card-header">
-                        <span class="project-icon">&#x1F916;</span>
-                        <h3><a href="blog-recursivemas.html">Recursive-MAS MiniCPM</a></h3>
+                        <span class="project-icon project-icon-ai" aria-hidden="true">◎</span>
+                        <h3>Recursive-MAS MiniCPM</h3>
                     </div>
+                    <div class="project-meta"><span class="project-status status-private">Private</span><span>AI research · Active</span></div>
                     <p class="project-desc">Edge-optimized recursive-thinking multi-agent system. Custom Qwen3.5-based transformer with mixed attention (linear + full), Grouped Query Attention (4× KV cache reduction), and DCT-based weight compression.</p>
                     <div class="tech-tags">
                         <span>PyTorch</span><span>Transformers</span><span>GQA</span><span>RoPE</span>
@@ -209,7 +232,7 @@
 
                 <div class="project-card">
                     <div class="project-card-header">
-                        <span class="project-icon">&#x1F9F9;</span>
+                        <span class="project-icon project-icon-rl" aria-hidden="true">⌁</span>
                         <h3><a href="blog-cleaning-robot.html">Multi-Agent Cleaning Robot</a></h3>
                     </div>
                     <p class="project-desc">Cooperative multi-agent RL system with three agents cleaning a 12×12 grid. Implemented Independent PPO and MAPPO with shared global critic, GAE advantage estimation, and custom CNN policy networks from scratch.</p>
@@ -220,7 +243,7 @@
 
                 <div class="project-card">
                     <div class="project-card-header">
-                        <span class="project-icon">&#x1F527;</span>
+                        <span class="project-icon project-icon-systems" aria-hidden="true">∿</span>
                         <h3><a href="blog-flexgemm.html">FlexGEMM — CPU Fallback</a></h3>
                     </div>
                     <p class="project-desc">Extending a Triton-powered GEMM backend for 3D sparse convolutions with CPU fallback support. Implementing coordinate-building kernels for hardware with limited GPU memory.</p>
@@ -504,6 +527,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
