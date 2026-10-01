@@ -10,9 +10,10 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">PG</a>
@@ -20,25 +21,21 @@
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#work">Work</a></li>
                 <li><a href="index.html#now">Now</a></li>
                 <li><a href="index.html#experience">Experience</a></li>
-                <li><a href="index.html#projects">Projects</a></li>
-                <li><a href="index.html#skills">Skills</a></li>
-                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="blog.html" class="active">Writing</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
-                <li><a href="blog.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
 
-    <article class="blog-post">
+    <article class="blog-post" id="main-content">
         <div class="container">
             <div class="blog-post-content">
-                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                <a href="blog.html" class="blog-back">← All writing</a>
                 
                 <header class="post-header">
-                    <span class="post-icon">&#x1F916;</span>
                     <h1>Recursive-MAS MiniCPM</h1>
                     <p class="post-subtitle">Edge-Optimized Recursive Thinking with Mixed Attention Architecture</p>
                     <div class="post-meta">
@@ -73,14 +70,12 @@
                         <h2>Related Projects</h2>
                         <div class="related-grid">
                             <a href="blog-cleaning-robot.html" class="related-card">
-                                <span>&#x1F9F9;</span>
                                 <div>
                                     <strong>Multi-Agent Cleaning Robot</strong>
                                     <p>Multi-agent RL with PPO/MAPPO</p>
                                 </div>
                             </a>
                             <a href="blog-flexgemm.html" class="related-card">
-                                <span>&#x1F527;</span>
                                 <div>
                                     <strong>FlexGEMM</strong>
                                     <p>HPC for sparse convolutions</p>
@@ -95,10 +90,12 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+            <span>© 2026 Pratham Gohil</span>
+            <span>Hand-built with HTML, CSS &amp; JS · <a href="index.html">Home</a></span>
         </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="post.js"></script>
 </body>
 </html>

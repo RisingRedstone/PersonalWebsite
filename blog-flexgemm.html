@@ -3,187 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlexGEMM — Blog | Pratham Gohil</title>
-    <meta name="description" content="Extending a Triton-powered GEMM backend for 3D sparse convolutions with CPU fallback support for hardware with limited GPU memory.">
+    <title>FlexGEMM CPU fallback — Writing | Pratham Gohil</title>
+    <meta name="description" content="Writing CPU versions of FlexGEMM's coordinate-building kernels in C++17 and OpenMP, with a bucket dispatcher instead of atomics.">
+    <meta name="theme-color" content="#0d0c0a">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="blog-post.css">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="reading-progress" id="readingProgress"></div>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
 
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Primary">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">PG</a>
             <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#work">Work</a></li>
+                <li><a href="index.html#now">Now</a></li>
                 <li><a href="index.html#experience">Experience</a></li>
-                <li><a href="index.html#projects">Projects</a></li>
-                <li><a href="index.html#skills">Skills</a></li>
-                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="blog.html" class="active">Writing</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
-                <li><a href="blog.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
 
-    <article class="blog-post">
+    <article class="blog-post" id="main-content">
         <div class="container">
             <div class="blog-post-content">
-                <a href="blog.html" class="blog-back">← Back to Blog</a>
-                
+                <a href="blog.html" class="blog-back">← All writing</a>
+
                 <header class="post-header">
-                    <span class="post-icon">&#x1F527;</span>
-                    <h1>FlexGEMM — CPU Fallback</h1>
-                    <p class="post-subtitle">Cross-Platform Backend for High-Performance Sparse 3D Convolutions</p>
+                    <span class="status-badge status-active">Active</span>
+                    <h1>FlexGEMM: CPU fallback</h1>
+                    <p class="post-subtitle">Native C++ kernels for sparse 3D convolution on machines without enough GPU memory</p>
                     <div class="post-meta">
-                        <span class="reading-time">&#x1F552; 8 min read</span>
-                        <a href="https://github.com/RisingRedstone/FlexGEMM" target="_blank" rel="noopener" class="github-link">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                            View on GitHub (Fork)
-                        </a>
+                        <span class="reading-time">7 min read · Oct 2026</span>
+                        <a href="https://github.com/RisingRedstone/FlexGEMM" target="_blank" rel="noopener" class="github-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> Fork on GitHub</a>
                     </div>
-                    <div class="tech-tags">
-                        <span>Python</span>
-                        <span>Triton</span>
-                        <span>Sparse Convolutions</span>
-                        <span>PyTorch</span>
-                        <span>CPU Kernels</span>
-                    </div>
+                    <div class="tech-tags"><span>C++17</span><span>OpenMP</span><span>PyTorch</span><span>Triton</span><span>sparse convolution</span></div>
                 </header>
 
                 <div class="post-content">
-                    <section id="overview">
-                        <h2>Overview</h2>
-                        <p>FlexGEMM is a Triton-powered GEMM backend specifically designed for 3D sparse convolutions used in voxel-based neural networks. The original project (by JeffreyXiang) achieves ~2x speedup over existing solutions like <code>spconv</code> and <code>torchsparse</code> on FP16 and TF32 precision, tested on NVIDIA A100 80GB PCIe.</p>
-                        <p>My contribution focuses on extending coverage to CPU hardware — specifically writing CPU fallback implementations for the core coordinate-building CUDA kernels so FlexGEMM can operate on hardware with limited or no GPU memory. This work was motivated by hitting VRAM bottlenecks while running TRELLIS 2 (a 3D generation model that depends on sparse convolutions).</p>
-                    </section>
 
                     <section id="problem">
-                        <h2>The Problem</h2>
-                        <p>3D sparse convolutions operate on voxel grids where most cells are empty. The key computational challenge isn't the convolution itself — it's building the coordinate maps that tell the kernel which input voxels map to which output voxels. The original FlexGEMM implements these as CUDA kernels:</p>
+                        <h2>The problem</h2>
+                        <p>FlexGEMM, by JeffreyXiang, is a Triton GEMM backend for the 3D sparse convolutions used in voxel networks. The upstream project reports about 2× the speed of spconv and torchsparse on FP16 and TF32 on an A100 80&nbsp;GB PCIe.</p>
+                        <p>I ran into it while running TRELLIS&nbsp;2, which ran out of VRAM on my hardware. A sparse convolution first has to work out which output voxels exist, and in FlexGEMM that step is a CUDA kernel. With no GPU memory to spare there was nothing to fall back on, so the whole pipeline stopped. My branch adds CPU implementations of those coordinate-building kernels.</p>
+                        <div class="callout"><p data-label="Scope">Of the three coordinate-building steps, two now have native CPU kernels. The third, the submanifold neighbour map, still goes through a PyTorch fallback.</p></div>
+                    </section>
+
+                    <section id="approach">
+                        <h2>What I built</h2>
+                        <p>The work is on the <code>cpu-support</code> branch of my fork (issue&nbsp;#30, PR&nbsp;#29). It adds a C++17 extension compiled with OpenMP, exposing <code>hashmap_build_sparse_conv_out_coords</code> and <code>expand_unique_build_sparse_conv_out_coords</code>, and wires them into <code>SparseConv3dFunction</code> whenever the coordinates live on the CPU. It also includes CPU versions of the Z-order and Hilbert serialisations and a Bloom filter.</p>
+                        <p>The first version, from early July, was correct and very slow. Profiling it showed that <code>masked_select</code> and <code>unique</code> dominated, so the rest of the work went into those.</p>
+
+                        <h3 id="buckets">Bucket dispatcher instead of atomics</h3>
+                        <p>The GPU kernel inserts into one shared hash map with atomics. On the CPU that would put every thread on the same few cache lines. Instead the hash map is split into segments and a <code>BucketDispatcher</code> lets each thread lock one segment and work on it with no further synchronisation. Each lock is a <code>PaddedLock</code>, aligned to the cache line, so neighbouring locks do not false-share.</p>
+                        <div class="callout"><p data-label="Where this came from">It is the same rule I used in Threadweaver: values that different cores write must not share a cache line. A thread-per-bucket lock replaces the per-insert atomic.</p></div>
+
+                        <h3 id="select">Replacing masked_select</h3>
+                        <p><code>torch::masked_select</code> turned out to be very slow on the CPU for this workload. I wrote a CPU-specific replacement that removes the sentinel entries the kernel leaves behind. It reuses the bucket dispatcher: the input is divided into ranges whose output offsets are known in advance, each thread locks a range and copies the entries it keeps into that range's own part of the output, and the copy itself is branch-free. That commit made the kernel more than 60% faster in my profiling.</p>
+                    </section>
+
+                    <section id="results">
+                        <h2>Results</h2>
+                        <p>I checked the output of each kernel against the library's pure-PyTorch reference for output coordinates, using sphere-shaped voxel sets at resolutions 16, 32 and 64, with three convolution configurations (3×3×3 stride 1 pad 1, 3×3×3 with dilation and padding 2, and 2×2×2 stride 2). The outputs were identical in every case. Each figure is the median of three runs on an 8-thread laptop CPU (Ryzen 7 6800H).</p>
+                        <div class="benchmark-table">
+                            <table>
+                                <thead><tr><th scope="col">Kernel</th><th scope="col">Speed-up over PyTorch reference</th><th scope="col">Output</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>hashmap_build_sparse_conv_out_coords</code></td><td><strong>53× to 303×</strong></td><td>Identical</td></tr>
+                                    <tr><td><code>expand_unique_build_sparse_conv_out_coords</code></td><td><strong>39× to 410×</strong></td><td>Identical</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout"><p data-label="Read with care">The baseline is the pure-PyTorch CPU reference path, not the GPU kernel, and the inputs are synthetic spheres. It shows the native kernels are far better than the reference on the CPU, not that they match a GPU.</p></div>
+                    </section>
+
+                    <section id="next">
+                        <h2>What is left</h2>
                         <ul>
-                            <li><code>hashmap_build_sparse_conv_out_coords</code> — Builds output coordinate arrays for regular sparse convolutions using hash maps</li>
-                            <li><code>expand_unique_build_sparse_conv_out_coords</code> — Expands and deduplicates output coordinates</li>
-                            <li><code>hashmap_build_submanifold_conv_neighbour_map</code> — Builds neighbour maps for submanifold convolutions (where input and output coordinates are identical)</li>
+                            <li>A native CPU kernel for the submanifold neighbour map, which currently uses a PyTorch fallback.</li>
+                            <li>Benchmarks on real TRELLIS&nbsp;2 inputs, not just synthetic spheres.</li>
+                            <li>Continuing the conversation with the maintainers about how a maintained CPU path should be structured and tested in the library.</li>
                         </ul>
-                        <p>When GPU VRAM is exhausted (common with large 3D models on consumer hardware), there's no fallback — the entire pipeline fails. My work provides CPU-native implementations so these operations can complete, albeit at reduced speed.</p>
-                    </section>
-
-                    <section id="implementation">
-                        <h2>Implementation</h2>
-                        
-                        <h3 id="completed-kernels">Completed Kernels</h3>
-                        <p><strong><code>hashmap_build_sparse_conv_out_coords</code></strong> — CPU-native implementation tested and verified for correctness. Translates the CUDA hash-map-based coordinate building to CPU using Python dictionaries and NumPy operations. The key challenge was maintaining the same hash-collision handling semantics as the GPU version.</p>
-                        <p><strong><code>expand_unique_build_sparse_conv_out_coords</code></strong> — CPU-native implementation tested and verified for correctness. Handles the expansion of coordinate sets with deduplication, critical for ensuring output coordinates are unique before convolution.</p>
-
-                        <h3 id="in-progress">In Progress</h3>
-                        <p><strong><code>hashmap_build_submanifold_conv_neighbour_map</code></strong> — Currently functional but requires optimization. The CPU path is ~10x slower than the GPU path; the initial implementation prioritized correctness over performance. The bottleneck is poor performance of PyTorch CPU ops like <code>masked_select</code> when operating on large sparse tensors.</p>
-                    </section>
-
-                    <section id="technologies">
-                        <h2>Key Technologies</h2>
-                        <ul>
-                            <li><strong>Triton kernel language</strong> — The GPU kernels are written in Triton, a Python-like DSL for GPU programming. Understanding Triton was essential for writing correct CPU equivalents.</li>
-                            <li><strong>PyTorch sparse tensor operations</strong> — COO/CSC sparse formats for representing voxel coordinates and neighbour relationships.</li>
-                            <li><strong>Split-K parallelism</strong> — Used in the GPU path for large convolutions; the CPU path uses different parallelization strategies.</li>
-                            <li><strong>Map/coordinate building</strong> — The fundamental operation: given input coordinates and a kernel size, determine which output coordinates exist and how they map.</li>
-                        </ul>
-                    </section>
-
-                    <section id="challenges">
-                        <h2>Challenges & Trade-offs</h2>
-                        <p>The fundamental tension in CPU fallback design is <strong>correctness vs. performance</strong>. The GPU kernels are highly optimized for parallel execution — hash maps with atomic operations, warp-level primitives, and memory coalescing. Translating these to CPU requires different algorithms entirely:</p>
-                        <ul>
-                            <li>GPU hash maps → Python dictionaries (correct but slow)</li>
-                            <li>Warp-level atomics → Sequential operations with locks</li>
-                            <li>Memory-coalesced access → Cache-friendly but different access patterns</li>
-                        </ul>
-                        <p>The <code>masked_select</code> bottleneck on the CPU path is a known PyTorch limitation. I've raised this with the FlexGEMM maintainers to discuss architectural integration approaches for a maintained CPU execution path. Potential solutions include replacing <code>masked_select</code> with boolean indexing or implementing custom C++ extensions.</p>
-                    </section>
-
-                    <section id="status">
-                        <h2>Status & Next Steps</h2>
-                        <p>Two of three kernels are complete and verified. The submanifold convolution neighbour map is functional but needs optimization. The long-term goal is to integrate the CPU path into FlexGEMM's main codebase as a first-class fallback, enabling 3D sparse convolution models to run on CPU-only hardware (laptops, edge devices, cloud instances without GPUs).</p>
-                        <p>This work directly enables running models like TRELLIS 2 on consumer hardware where VRAM is the limiting factor, democratizing access to 3D generation research.</p>
                     </section>
 
                     <section class="related-projects">
-                        <h2>Related Projects</h2>
-                        <div class="related-grid">
-                            <a href="blog-threadweaver.html" class="related-card">
-                                <span>&#x26A1;</span>
-                                <div>
-                                    <strong>Threadweaver Core</strong>
-                                    <p>HPC concurrency primitives</p>
-                                </div>
-                            </a>
-                            <a href="blog-recursivemas.html" class="related-card">
-                                <span>&#x1F916;</span>
-                                <div>
-                                    <strong>Recursive-MAS MiniCPM</strong>
-                                    <p>Edge-optimized transformer</p>
-                                </div>
-                            </a>
-                        </div>
+                        <h2>Related</h2>
+                        <div class="related-grid"><a href="blog-threadweaver.html" class="related-card"><strong>Threadweaver</strong><p>The same cache-line discipline, applied to a lock-free queue.</p></a><a href="blog-cleaning-robot.html" class="related-card"><strong>Multi-Agent Cleaning Robot</strong><p>A multi-agent RL project written from scratch in PyTorch.</p></a></div>
                     </section>
                 </div>
             </div>
 
-            <aside class="post-toc">
-                <h4 class="toc-title">On this page</h4>
-                <ul class="toc-list">
-                    <li><a href="#overview">Overview</a></li>
-                    <li><a href="#problem">The Problem</a></li>
-                    <li>
-                        <a href="#implementation">Implementation</a>
-                        <ul class="toc-list">
-                            <li class="toc-h3"><a href="#completed-kernels">Completed Kernels</a></li>
-                            <li class="toc-h3"><a href="#in-progress">In Progress</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#technologies">Key Technologies</a></li>
-                    <li><a href="#challenges">Challenges & Trade-offs</a></li>
-                    <li><a href="#status">Status & Next Steps</a></li>
-                </ul>
+            <aside class="post-toc" aria-label="On this page">
+                <h2 class="toc-title">On this page</h2>
+                <ul class="toc-list"><li><a href="#problem">The problem</a></li><li><a href="#approach">What I built</a><ul class="toc-list"><li class="toc-h3"><a href="#buckets">Bucket dispatcher instead of atomics</a></li><li class="toc-h3"><a href="#select">Replacing masked_select</a></li></ul></li><li><a href="#results">Results</a></li><li><a href="#next">What is left</a></li></ul>
             </aside>
         </div>
     </article>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+            <span>© 2026 Pratham Gohil</span>
+            <span>Hand-built with HTML, CSS &amp; JS · <a href="index.html">Home</a></span>
         </div>
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('readingProgress').style.width = scrolled + '%';
-        });
-
-        const tocLinks = document.querySelectorAll('.toc-list a');
-        const sections = document.querySelectorAll('.post-content section[id], .post-content h3[id]');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 150) current = section.getAttribute('id');
-            });
-            tocLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
-            });
-        });
-    </script>
+    <script src="post.js"></script>
 </body>
 </html>

@@ -10,10 +10,11 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="reading-progress" id="readingProgress"></div>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
 
     <nav class="navbar">
         <div class="nav-container">
@@ -22,28 +23,25 @@
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#work">Work</a></li>
+                <li><a href="index.html#now">Now</a></li>
                 <li><a href="index.html#experience">Experience</a></li>
-                <li><a href="index.html#projects">Projects</a></li>
-                <li><a href="index.html#skills">Skills</a></li>
-                <li><a href="index.html#publications">Publications</a></li>
+                <li><a href="blog.html" class="active">Writing</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
-                <li><a href="blog.html" class="active">Blog</a></li>
             </ul>
         </div>
     </nav>
 
-    <article class="blog-post">
+    <article class="blog-post" id="main-content">
         <div class="container">
             <div class="blog-post-content">
-                <a href="blog.html" class="blog-back">← Back to Blog</a>
+                <a href="blog.html" class="blog-back">← All writing</a>
                 
                 <header class="post-header">
-                    <span class="post-icon">&#x1F9F9;</span>
                     <h1>Multi-Agent Cleaning Robot</h1>
                     <p class="post-subtitle">Cooperative Reinforcement Learning with Independent PPO & MAPPO</p>
                     <div class="post-meta">
-                        <span class="reading-time">&#x1F552; 14 min read</span>
+                        <span class="reading-time">14 min read</span>
                         <span class="wip-badge">Work In Progress — No public repo yet</span>
                     </div>
                     <div class="tech-tags">
@@ -167,7 +165,7 @@
                             <li><strong>Per-Agent Critic (I-PPO):</strong> Same CNN backbone as actor, <code>Linear(128 → 64 → 64 → 64 → 1)</code> outputting scalar state-value</li>
                             <li><strong>Global Critic (MAPPO):</strong> <code>Conv2d(4 → 6, dilation=2)</code> + <code>Conv2d(6 → 8, 5)</code> → Flatten → <code>Linear(128 → 64 → 1)</code>; takes concatenated global state (fragile + overlap of self+others + combined explore mask + docking)</li>
                         </ul>
-                        <p>The dilated convolution (dilation=2) is critical — it allows the network to "see" a larger receptive field without increasing parameters, important for a 12×12 grid where agents need global awareness.</p>
+                        <p>The dilated convolution (dilation=2) widens the receptive field without adding parameters, which is the reason I used it on a grid this small, where each agent benefits from seeing most of the map.</p>
 
                         <h3 id="fc-baselines">Fully-Connected Ablation Models</h3>
                         <p>As a baseline comparison, fully-connected networks (<code>ActorRec</code> / <code>CriticRec</code>) were also implemented: raw flatten(12×12×5=720) → <code>Linear(720 → 128 → 64 → 64 → 5/1)</code>. This measures the value of spatial inductive bias in this task.</p>
@@ -185,13 +183,13 @@
                     </section>
 
                     <section id="lessons">
-                        <h2>Lessons Learned</h2>
+                        <h2>Open questions</h2>
+                        <div class="callout"><p data-label="Status">This post documents the design and the code. It does not report trained-policy results: I have not published reward curves or a comparison, so I make no claim about which variant wins.</p></div>
                         <ul>
-                            <li><strong>GAE normalization matters.</strong> Without zero-mean/unit-variance normalization of advantages, training is unstable and diverges quickly. This is especially true in multi-agent settings where reward scales can vary dramatically between agents.</li>
-                            <li><strong>Entropy scheduling is non-trivial.</strong> Too much entropy → agents wander randomly. Too little → agents converge to "stay still" (safe but useless). A decay schedule works better than a fixed coefficient.</li>
-                            <li><strong>Centralized critics aren't magic.</strong> MAPPO's shared critic requires careful architecture — if the concatenated state space is too large, the critic overfits. Dimensionality reduction or attention mechanisms might help.</li>
-                            <li><strong>Environment design is 80% of the work.</strong> Getting the reward function right (balancing cleaning reward vs. obstacle penalty vs. time penalty) took more iteration than the RL algorithms themselves.</li>
-                            <li><strong>CNNs beat MLPs for spatial tasks.</strong> The dilated convolution architecture significantly outperforms the fully-connected baseline, confirming that spatial inductive bias matters even in small grid worlds.</li>
+                            <li><strong>Does the centralised critic help?</strong> The hypothesis is that MAPPO's shared critic can learn that agents covering different regions is better than redundant coverage. The test is I-PPO against MAPPO on the same seeds and the same fixed dirt layout.</li>
+                            <li><strong>Does spatial structure matter?</strong> The fully-connected ActorRec and CriticRec models exist to measure that against the dilated CNN.</li>
+                            <li><strong>Fixed horizon or natural termination?</strong> The continuous-episode variant normalises advantages per mini-batch and collects until the grid is clean. Comparing it to the 400-step rollout buffer is still to do.</li>
+                            <li><strong>Reward shaping.</strong> The weights (+2, +4, -1, -0.1, -20, +20) are hand-set, and the obvious ablations are to drop the revisit penalty and the idle penalty.</li>
                         </ul>
                     </section>
 
@@ -199,7 +197,6 @@
                         <h2>Related Projects</h2>
                         <div class="related-grid">
                             <a href="blog-recursivemas.html" class="related-card">
-                                <span>&#x1F916;</span>
                                 <div>
                                     <strong>Recursive-MAS MiniCPM</strong>
                                     <p>Multi-agent RL meets transformer architectures</p>
@@ -211,7 +208,7 @@
             </div>
 
             <aside class="post-toc">
-                <h4 class="toc-title">On this page</h4>
+                <h2 class="toc-title">On this page</h2>
                 <ul class="toc-list">
                     <li><a href="#overview">Overview</a></li>
                     <li>
@@ -238,7 +235,7 @@
                         </ul>
                     </li>
                     <li><a href="#training">Training Infrastructure</a></li>
-                    <li><a href="#lessons">Lessons Learned</a></li>
+                    <li><a href="#lessons">Open Questions</a></li>
                 </ul>
             </aside>
         </div>
@@ -246,32 +243,12 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Pratham Gohil. Built with vanilla HTML, CSS & JS.</p>
+            <span>© 2026 Pratham Gohil</span>
+            <span>Hand-built with HTML, CSS &amp; JS · <a href="index.html">Home</a></span>
         </div>
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('readingProgress').style.width = scrolled + '%';
-        });
-
-        const tocLinks = document.querySelectorAll('.toc-list a');
-        const sections = document.querySelectorAll('.post-content section[id], .post-content h3[id]');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 150) current = section.getAttribute('id');
-            });
-            tocLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
-            });
-        });
-    </script>
+    <script src="post.js"></script>
 </body>
 </html>

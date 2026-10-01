@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matching Engine Threadweaver — Writing | Pratham Gohil</title>
+    <meta name="description" content="The three lock-free buffer protocols behind a C++23 matching engine in progress, what each is for, and what is built so far.">
+    <meta name="theme-color" content="#0d0c0a">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-post.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+
+    <nav class="navbar" aria-label="Primary">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PG</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#work">Work</a></li>
+                <li><a href="index.html#now">Now</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="blog.html" class="active">Writing</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <article class="blog-post" id="main-content">
+        <div class="container">
+            <div class="blog-post-content">
+                <a href="blog.html" class="blog-back">← All writing</a>
+
+                <header class="post-header">
+                    <span class="status-badge status-active">Active</span>
+                    <h1>Matching Engine Threadweaver</h1>
+                    <p class="post-subtitle">Three ring-buffer protocols for a low-latency matching engine, and an honest status report</p>
+                    <div class="post-meta">
+                        <span class="reading-time">8 min read · Oct 2026</span>
+                        <a href="https://github.com/RisingRedstone/Matching-Engine-Threadweaver" target="_blank" rel="noopener" class="github-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> Source on GitHub</a>
+                    </div>
+                    <div class="tech-tags"><span>C++23</span><span>lock-free</span><span>MPSC</span><span>cmov</span><span>Nix</span><span>callgrind</span></div>
+                </header>
+
+                <div class="post-content">
+
+                    <section id="status">
+                        <h2>Where it stands</h2>
+                        <p>The goal is a matching engine for high-frequency workloads, in C++23, built hardware-first. So far I have built and benchmarked the layer underneath it: the messaging between processes and the shared-memory allocators, plus an early skip list. The matching logic itself is not written yet.</p>
+                        <div class="callout"><p data-label="Status">The 1.25B and 650M ops/sec figures in this post measure the ring buffers. They are the foundation of the engine, not an end-to-end order-matching rate.</p></div>
+                    </section>
+
+                    <section id="protocols">
+                        <h2>Three protocols</h2>
+                        <p>One engine needs different queues for different traffic. A single producer feeding a single consumer should pay almost nothing. Many producers feeding one consumer must not serialise on one shared counter. I built a protocol for each.</p>
+                        <div class="benchmark-table">
+                            <table>
+                                <thead><tr><th scope="col">Protocol</th><th scope="col">Shared state</th><th scope="col">Best for</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Simple</td><td>One atomic head per direction</td><td>One producer, one consumer</td></tr>
+                                    <tr><td>Three-pointer</td><td><code>write_head</code>, <code>commit_head</code>, <code>read_head</code>, each on its own line</td><td>Several producers, one consumer</td></tr>
+                                    <tr><td>Cell-lockable</td><td>Two heads, plus a lock bit in every cell</td><td>Heavy multi-producer contention</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 id="simple">Simple</h3>
+                        <p>Each side keeps a cached copy of its own head and loads the other's with acquire semantics. A write fails when <code>w_h &gt;= size + r_h</code>. There is also a branchless variant that uses inline x86 <code>cmov</code> to pick pointers, so a rarely-taken condition does not cost a pipeline flush. The <a href="blog-threadweaver.html#simple-buffer">Threadweaver post</a> walks through this one with an animation.</p>
+
+                        <h3 id="three-pointer">Three-pointer</h3>
+                        <p>Producers claim a slot by CAS on <code>write_head</code>, write their data, then publish by CAS on <code>commit_head</code>. The consumer only reads <code>commit_head</code>. Keeping those two on separate cache lines means a producer's claim does not disturb the line the consumer polls. Producers still wait for each other at <code>commit_head</code>, and that is the bottleneck the next protocol removes.</p>
+
+                        <h3 id="cell-lockable">Cell-lockable</h3>
+                        <p>There is no <code>commit_head</code>. A producer takes a slot with <code>fetch_add</code> on <code>write_head</code>, then spin-locks that one cell before writing. The lock is a single bit in a one-byte header, set with an inline <code>lock bts</code>, and an RAII guard releases it. Contention is spread over as many cells as the buffer has. The optimised variant uses <code>_mm_pause()</code> while spinning, caches the write head, and uses relaxed increments.</p>
+                    </section>
+
+                    <section id="numbers">
+                        <h2>Benchmarks</h2>
+                        <div class="benchmark-table">
+                            <table>
+                                <thead><tr><th scope="col">Configuration</th><th scope="col">Throughput</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1 producer, 1 consumer</td><td><strong>1.25B ops/sec</strong></td></tr>
+                                    <tr><td>8 producers, 1 consumer</td><td><strong>650M ops/sec</strong></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>In the benchmark processes the producer and consumer are pinned to separate cores, and the harness counts cycles with <code>rdtscp</code>. Profiling used callgrind with cache simulation and instruction dumps, viewed in kcachegrind.</p>
+                    </section>
+
+                    <section id="decisions">
+                        <h2>Design decisions</h2>
+                        <ol>
+                            <li><strong>Cell-lockable for scaling.</strong> Serialising producers on one commit counter does not survive heavy contention, so the lock moves into the cells. At 8×8 threads this was about 3× faster than the naive baselines.</li>
+                            <li><strong>64-byte granularity everywhere.</strong> Heads are a full line apart, and containers are packed to exactly one line, checked with <code>static_assert</code>.</li>
+                            <li><strong>No mutexes.</strong> Every synchronisation point is an atomic: <code>compare_exchange_weak</code>, <code>fetch_add</code>, or a test-and-set on a lock bit.</li>
+                            <li><strong>Mistakes fail the build.</strong> Capacity, index types and guard types are checked by concepts, so a wrong combination does not compile.</li>
+                            <li><strong>Huge pages.</strong> Buffers are mapped with 2&nbsp;MB pages to keep the TLB from becoming the limit at large sizes.</li>
+                        </ol>
+                    </section>
+
+                    <section class="related-projects">
+                        <h2>Related</h2>
+                        <div class="related-grid"><a href="blog-threadweaver.html" class="related-card"><strong>Threadweaver</strong><p>Layouts, shared memory and an animated model of the simple buffer.</p></a><a href="blog-cleaning-robot.html" class="related-card"><strong>Multi-Agent Cleaning Robot</strong><p>A very different project, from the AI side.</p></a></div>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="post-toc" aria-label="On this page">
+                <h2 class="toc-title">On this page</h2>
+                <ul class="toc-list"><li><a href="#status">Where it stands</a></li><li><a href="#protocols">Three protocols</a><ul class="toc-list"><li class="toc-h3"><a href="#simple">Simple</a></li><li class="toc-h3"><a href="#three-pointer">Three-pointer</a></li><li class="toc-h3"><a href="#cell-lockable">Cell-lockable</a></li></ul></li><li><a href="#numbers">Benchmarks</a></li><li><a href="#decisions">Design decisions</a></li></ul>
+            </aside>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="container">
+            <span>© 2026 Pratham Gohil</span>
+            <span>Hand-built with HTML, CSS &amp; JS · <a href="index.html">Home</a></span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="post.js"></script>
+</body>
+</html>
